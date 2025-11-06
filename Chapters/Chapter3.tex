@@ -42,53 +42,29 @@ Todos los capítulos deben comenzar con un breve párrafo introductorio que indi
 
 
 %----------------------------------------------------------------------------------------
-%	SECTION 1
+
+\section{Diagrama en bloques del sistema} % 1 página
+
 %----------------------------------------------------------------------------------------
-\section{Análisis del software}
- 
-La idea de esta sección es resaltar los problemas encontrados, los criterios utilizados y la justificación de las decisiones que se hayan tomado.
 
-Se puede agregar código o pseudocódigo dentro de un entorno lstlisting con el siguiente código:
+%----------------------------------------------------------------------------------------
 
-\begin{verbatim}
-\begin{lstlisting}[caption= "un epígrafe descriptivo"]
-	las líneas de código irían aquí...
-\end{lstlisting}
-\end{verbatim}
+\section{Desarrollo del firmware} % 1 página
 
-A modo de ejemplo, se muestra el fragmento de código \ref{cod:vControl}:
+%----------------------------------------------------------------------------------------
 
-\begin{lstlisting}[label=cod:vControl,caption=Pseudocódigo del lazo principal de control.]  % Start your code-block
+%----------------------------------------------------------------------------------------
 
-#define MAX_SENSOR_NUMBER 3
-#define MAX_ALARM_NUMBER  6
-#define MAX_ACTUATOR_NUMBER 6
+\section{Desarrollo del software} % 1 página
 
-uint32_t sensorValue[MAX_SENSOR_NUMBER];		
-FunctionalState alarmControl[MAX_ALARM_NUMBER];	//ENABLE or DISABLE
-state_t alarmState[MAX_ALARM_NUMBER];						//ON or OFF
-state_t actuatorState[MAX_ACTUATOR_NUMBER];			//ON or OFF
+%----------------------------------------------------------------------------------------
 
-void vControl() {
+%----------------------------------------------------------------------------------------
 
-	initGlobalVariables();
-	
-	period = 500 ms;
-		
-	while(1) {
+\section{Desarrollo del hardware} % 1 página
 
-		ticks = xTaskGetTickCount();
-		
-		updateSensors();
-		
-		updateAlarms();
-		
-		controlActuators();
-		
-		vTaskDelayUntil(&ticks, period);
-	}
-}
-\end{lstlisting}
+%----------------------------------------------------------------------------------------
+
 
 
 
