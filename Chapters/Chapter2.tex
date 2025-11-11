@@ -5,12 +5,39 @@
 
 %----------------------------------------------------------------------------------------
 
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+En este capítulo se describe brevemente cómo se codifican los mensajes MIDI de acuerdo al estándar, y posteriormente se listan las herramientas utilizadas para el desarrollo del firmware, el software y el hardware del trabajo.
 
 %----------------------------------------------------------------------------------------
 
-\section{Introducción a la problemática} % 1 página
+\section{Formato de mensajes MIDI} % 1 página
 
+El estándar MIDI está basado en el envío de datos a través de un puerto serie opto-aislado que opera a una velocidad de 31250 baudios. Para codificar los mensajes, en primer lugar se hace la distinción entre dos tipos de bytes: de Estado (\textit{Status Byte}) y de Datos (\textit{Data Byte}). En la figura \ref{fig:midi-byte} se ilustra esta diferencia.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.5\textwidth]{./Figures/midi-byte.png}
+	\caption{Tipos de ``bytes'' según el estándar MIDI.}
+	\label{fig:midi-byte}
+\end{figure}
+
+Un byte de datos es aquel que tiene su MSB (\textit{Most Significant Bit}, bit más significativo) igual a cero. Es decir que su rango está entre \texttt{0x00} (0 decimal) y \texttt{0x0F} (127 decimal). Por el contrario, un byte de estado tiene su MSB igual a uno, por lo que su rango oscila entre \texttt{0x80} (128 decimal) y \texttt{0xFF} (255  decimal).
+
+El propósito de un byte de estado es el de actuar como encabezado, identificando el tipo de mensaje MIDI. Este consistirá de un byte de estado, seguido de:
+\begin{enumerate}
+	\item Ningún byte de dato.
+	\item Un byte de dato.
+	\item Dos bytes de dato.
+	\item Múltiple bytes de dato.
+\end{enumerate}
+
+En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posible casos.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/structure-midi-message.png}
+	\caption{}
+	\label{fig:structure-midi-message}
+\end{figure}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
