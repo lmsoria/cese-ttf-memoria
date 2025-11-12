@@ -5,7 +5,7 @@
 \label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1}
 \label{IntroGeneral}
 
-Este capítulo introduce la problemática de la interconexión de instrumentos musicales electrónicos. Luego se analizan algunas alternativas comerciales y se describe la motivación por la que se realizó este desarrollo. Finalmente, se presentan los objetivos y alcances del trabajo realizado.
+Este capítulo introduce la problemática de la interconexión de instrumentos musicales electrónicos, se analizan algunas alternativas comerciales y se describe la motivación por la que se realizó este desarrollo. Finalmente, se presentan los objetivos y alcances del trabajo realizado.
 
 
 %----------------------------------------------------------------------------------------
@@ -20,15 +20,15 @@ Este capítulo introduce la problemática de la interconexión de instrumentos m
 
 %----------------------------------------------------------------------------------------
 
-\section{Introducción a la problemática} % 1 página
+\section{Problemática a resolver} \label{problematica}
 
-Es frecuente encontrar en estudios de grabación y/o producción musical una variedad de instrumentos musicales electrónicos, principalmente sintetizadores o unidades de efectos.
+Dentro de los estudios de grabación y los entornos de producción musical es frecuente la presencia de múltiples instrumentos musicales electrónicos, principalmente sintetizadores y procesadores de efectos.
 
-Estos equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}, Interfaz Digital de Instrumentos Musicales). Este define un mecanismo de comunicación que permite la transferencia de información entre los instrumentos, computadoras y otros dispositivos relacionados con la producción musical.
+Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}, Interfaz Digital de Instrumentos Musicales), que establece un mecanismo para la transferencia de información entre instrumentos, computadoras y otros dispositivos vinculados a la producción musical.
 
 Para garantizar una correcta interoperabilidad, MIDI no solo define el protocolo (es decir, el formato de los mensajes), sino también la conexión física entre ellos mediante la especificación de los cables y conectores que deben usarse.
 
-En la especificación original, la \textit{MIDI Manufacturers Association} (MMA, Asociación de Fabricantes MIDI) adoptó el conector DIN de 5 pines a 180° como interfaz física estandarizada para interconectar equipos \cite{mma:midi_spec}. En la figura \ref{fig:din5} se muestra, a modo de ejemplo, el panel trasero de un sintetizador, donde se observan dos conectores etiquetados como MIDI OUT y MIDI IN.
+En la especificación original, la \textit{MIDI Manufacturers Association} (MMA, Asociación de Fabricantes MIDI) adoptó el conector DIN de 5 pines a 180° como interfaz física estandarizada para interconectar equipos \cite{mma:midi_spec}. En la figura \ref{fig:din5} se muestra a modo de ejemplo, el panel trasero de un sintetizador, donde se observan dos conectores etiquetados como MIDI OUT y MIDI IN.
 
 \begin{figure}[ht]
 	\centering
@@ -37,41 +37,41 @@ En la especificación original, la \textit{MIDI Manufacturers Association} (MMA,
 	\label{fig:din5}
 \end{figure}
 
-A partir de lo expuesto anteriormente se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar también menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, conformando una topología en cadena (\textit{daisy chain}). En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
+A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar también menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/daisy-chain.png}
-	\caption{Diagrama de una topología \textit{daisy chain}. Ésta requiere que el equipo disponga de un puerto MIDI THRU.}
+	\caption{Diagrama de una topología daisy chain.}
 	\label{fig:daisy}
 \end{figure}
 
-Al incrementar la cantidad de equipos se dificulta la interconexión entre ellos. En la figura \ref{fig:ad-hoc} se muestra una hipotética conexión de dos controladores con cuatro sintetizadores.
+Al incrementar la cantidad de equipos se dificulta la interconexión entre ellos. La figura \ref{fig:ad-hoc} presenta un esquema de conexión entre dos controladores y cuatro sintetizadores.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/ad-hoc.png}
-	\caption{Ejemplo de una conexión hipotética entre dos controladores y cuatro sintetizadores. El secuenciador controlaría a los sintetizadores 2, 3 y 4, mientras que el controlador controlaría al sintetizador 1.}
+	\caption{Diagrama de interconexión entre dos controladores y cuatro sintetizadores.}
 	\label{fig:ad-hoc}
 \end{figure}
 
-Dado que la salida MIDI THRU replica lo que ingresa por MIDI IN, el secuenciador únicamente puede controlar la cadena de sintetizadores 2, 3 y 4, mientras que el controlador solo puede controlar el sintetizador 1. Para invertir este esquema de control es necesario reconfigurar el cableado, lo que puede resultar incómodo desde el punto de vista operativo e incluso propenso a errores.
+Debido a que la salida MIDI THRU replica la señal recibida por MIDI IN, el secuenciador únicamente puede gestionar los sintetizadores 2, 3 y 4, mientras que el controlador queda limitado al sintetizador 1. Invertir esta estructura de control requiere modificar el cableado, una tarea poco conveniente desde el punto de vista operativo y susceptible a generar errores..
 
-Una solución a esta clase de problemas consiste en incorporar un equipo adicional llamado \textit{router} MIDI, que dispone de múltiples entradas y salidas independientes. Al interconectar los equipos a través de él se obtiene una topología en estrella, con el router como nodo central. En la figura \ref{fig:centralizada} se muestran los mismos equipos de la figura \ref{fig:ad-hoc} conectados a través del router.
+Una solución a esta problemática es la incorporación de un router MIDI, que dispone de múltiples entradas y salidas independientes. Al interconectar los equipos a través de él se obtiene una topología en estrella, con el router como nodo central. En la figura \ref{fig:centralizada} se muestran los mismos equipos de la figura \ref{fig:ad-hoc} conectados a través del router.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/centralizada.png}
-	\caption{Reconexión de los equipos de la figura \ref{fig:ad-hoc}, esta vez usando un router central.}
+	\caption{Diagrama de interconexión entre dos controladores y cuatro sintetizadores conectados a través de un router central.}
 	\label{fig:centralizada}
 \end{figure}
 
-Se observa un cableado más directo e intuitivo, lo que reduce la probabilidad de errores. Además, tanto el controlador como el secuenciador pueden controlar a cualquiera de los cuatro sintetizadores, lo que aporta mayor flexibilidad de uso.
+El esquema presenta un cableado más claro y directo, lo que reduce la posibilidad de errores. Además, tanto el controlador como el secuenciador pueden controlar a cualquiera de los cuatro sintetizadores, lo que aporta mayor flexibilidad de uso.
 %----------------------------------------------------------------------------------------
 
-\section{Estado del arte}
+\section{Estado del arte} \label{estado-arte}
 
-Hoy en día existen diversas soluciones comerciales en el mercado global. A la hora de elegir un equipo se tienen en cuenta (entre otras cosas) las siguientes características:
+Actualmente existen diversas soluciones comerciales a nivel internacional. Para la selección de un equipo se valoran, entre otros aspectos, las siguientes características:
 \begin{itemize}
 	\item Cantidad de entradas y salidas.
 	\item Capacidad de direccionamiento de las entradas.
@@ -79,31 +79,37 @@ Hoy en día existen diversas soluciones comerciales en el mercado global. A la h
 	\item Configuración mediante PC o \textit{stand-alone}.
 \end{itemize}
 
-En esta sección se presenta una lista general (pero no exhaustiva) de algunas de las alternativas más populares.
+En esta sección se presenta una lista general (pero no exhaustiva) de algunas de las alternativas más populares:
+\begin{enumerate}
+	\item Kenton THRU-12.
+	\item MIDI Solutions Quadra Merge.
+	\item Conductive Labs MRCC
+	\item iConnectivity mioXL
+\end{enumerate}
 
 \subsection{Kenton THRU-12}
-Desarrollado por la firma británica Kenton, este modelo posee una entrada que es replicada en sus doce salidas. A los equipos con esta característica se los conoce también como \textit{thru boxes}. En la figura \ref{fig:kenton} se muestra una fotografía del producto.
+Desarrollado por la firma británica Kenton, este modelo posee una entrada que es replicada en sus doce salidas. Los equipos con este tipo de funcionalidad se conocen como thru boxes. En la figura \ref{fig:kenton} se muestra una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.5\textwidth]{./Figures/kenton.png}
-	\caption{Kenton THRU-12. Es una \textit{thru box} de una entrada y doce salidas. Imagen tomada de la página oficial del fabricante\protect\footnotemark.}
+	\caption{Kenton THRU-12\protect\footnotemark.}
 	\label{fig:kenton}
 \end{figure}
 
-\footnotetext{Imagen tomada de \url{https://kentonuk.com/product/thru-12/}}
+\footnotetext{Imagen tomada de \url{https://kentonuk.com/product/thru-12/}.}
 
 \subsection{MIDI Solutions Quadra Merge}
-Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro entradas que se combinan y son redirigidas a dos salidas. Los equipos que fusionan varias entradas en una o más salidas son conocidos como \textit{merge boxes}. En la figura \ref{fig:midi-solutions} se muestra una fotografía del producto.
+Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro entradas que se combinan y son redirigidas a dos salidas. Los equipos que fusionan varias entradas en una o más salidas son conocidos como merge boxes. En la figura \ref{fig:midi-solutions} se observa una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.5\textwidth]{./Figures/midi-solutions.jpg}
-	\caption{MIDI Solutions Quadra Merge. Es una \textit{merge box} de cuatro entradas y dos salidas. Imagen tomada de la página oficial del fabricante\protect\footnotemark.}
+	\caption{MIDI Solutions Quadra Merge\protect\footnotemark.}
 	\label{fig:midi-solutions}
 \end{figure}
 
-\footnotetext{Imagen tomada de \url{https://midisolutions.com/prodqmr.htm}}
+\footnotetext{Imagen tomada de \url{https://midisolutions.com/prodqmr.htm}.}
 
 \subsection{Conductive Labs MRCC}
 Esta solución de la firma estadounidense Conductive Labs posee once entradas y diecisiete salidas. También ofrece opciones avanzadas de ``routeo'' y filtrado de mensajes, configurables a través de una pantalla integrada. En la figura \ref{fig:mrcc} se muestra una fotografía del producto.
@@ -111,26 +117,26 @@ Esta solución de la firma estadounidense Conductive Labs posee once entradas y 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./Figures/mrcc.png}
-	\caption{Conductive Labs MRCC. Es un router MIDI de once entradas y diecisiete salidas, con soporte de routeo y filtrado de mensajes. Imagen tomada de la página oficial del fabricante\protect\footnotemark.}
+	\caption{Conductive Labs MRCC\protect\footnotemark.}
 	\label{fig:mrcc}
 \end{figure}
 
-\footnotetext{Imagen tomada de \url{https://conductivelabs.com/mrcc/?v=c582dec943ff}}
+\footnotetext{Imagen tomada de \url{https://conductivelabs.com/mrcc/?v=c582dec943ff}.}
 
 \subsection{iConnectivity mioXL}
-Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, también ofrece opciones avanzadas de ``routeo'' y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se muestra una fotografía del producto.
+Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, también ofrece opciones avanzadas de ``routeo'' y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se presenta una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.9\textwidth]{./Figures/mioxl.jpg}
-	\caption{iConnectivity mioXL. Es un router MIDI de ocho entradas y doce salidas, con soporte de routeo y filtrado de mensajes. Imagen tomada de la página oficial del fabricante\protect\footnotemark.}
+	\caption{iConnectivity mioXL\protect\footnotemark.}
 	\label{fig:mioxl}
 \end{figure}
 
-\footnotetext{Imagen tomada de \url{https://www.iconnectivity.com/mioxl}}
+\footnotetext{Imagen tomada de \url{https://www.iconnectivity.com/mioxl}.}
 
 
-\subsection{Comparativa}
+\subsection{Comparativa de las alternartivas}
 Luego de mostrar algunas alternativas comerciales, se recopila en la tabla \ref{tab:comparativa-modelos} la lista de características analizada de cada una de ellas, agregando también el costo del producto en dólares estadounidenses.
 
 \begin{table}[h]
@@ -155,11 +161,11 @@ Luego de mostrar algunas alternativas comerciales, se recopila en la tabla \ref{
 
 %----------------------------------------------------------------------------------------
 
-\section{Motivación del trabajo}
+\section{Motivación del trabajo} \label{motivacion}
 
-En la sección anterior se mostraron algunos ejemplos de alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente \textit{thru boxes}), adecuados para replicación de señales pero insuficientes cuando se requiere ``routeo'' selectivo entre entradas y salidas o filtrado por tipo de mensaje.
+En la sección \ref{estado-arte} se mostraron algunas alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente thru boxes), adecuados para replicación de señales, pero insuficientes cuando se requiere ``routeo'' selectivo entre entradas y salidas o filtrado por tipo de mensaje.
 
-Es así como se planteó el desafío de desarrollar una versión local de menor costo que:
+En consecuencia se planteó el desafío de desarrollar una versión local de menor costo que:
 \begin{itemize}
 	\item Soporte múltiples entradas y salidas DIN.
 	\item Soporte filtrado de mensajes.
@@ -178,13 +184,6 @@ Se planteó como objetivo de este trabajo el desarrollo integral del prototipo d
 	\item Desarrollar el firmware para brindar la funcionalidad deseada.
 	\item Desarrollar una aplicación para controlar al equipo.
 	\item Diseñar un gabinete donde se alojen las placas.
-\end{itemize}
-
-Quedó fuera del alcance de este trabajo:
-\begin{itemize}
-	\item El diseño del hardware orientado a cumplir con certificaciones regulatorias.
-	\item La planificación de una manufactura a escala.
-	\item La optimización de costos para producción en serie.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
