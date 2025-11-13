@@ -5,13 +5,13 @@
 
 %----------------------------------------------------------------------------------------
 
-En este capítulo se describe brevemente cómo se codifican los mensajes MIDI de acuerdo al estándar, y posteriormente se listan las herramientas utilizadas para el desarrollo del firmware, el software y el hardware del trabajo.
+En este capítulo se describe brevemente cómo se codifican los mensajes MIDI de acuerdo con el estándar, y posteriormente se listan las herramientas utilizadas para el desarrollo del firmware, el software y el hardware del presente trabajo.
 
 %----------------------------------------------------------------------------------------
 
 \section{Formato de mensajes MIDI} % 1 página
 
-El estándar MIDI está basado en el envío de datos a través de un puerto serie opto-aislado que opera a una velocidad de 31250 baudios. Para codificar los mensajes, en primer lugar se hace la distinción entre dos tipos de bytes: de Estado (\textit{Status Byte}) y de Datos (\textit{Data Byte}). En la figura \ref{fig:midi-byte} se ilustra esta diferencia.
+El estándar MIDI se basa en el envío de datos a través de un puerto serie optoaislado que opera a una velocidad de 31250 baudios\cite{mma:midi_spec}. Para codificar los mensajes se establece, en primer lugar, una distinción entre dos tipos de bytes: de estado (\textit{Status Byte}) y de datos (\textit{Data Byte}). En la figura \ref{fig:midi-byte} se ilustra esta diferencia.
 
 \begin{figure}[ht]
 	\centering
@@ -20,29 +20,148 @@ El estándar MIDI está basado en el envío de datos a través de un puerto seri
 	\label{fig:midi-byte}
 \end{figure}
 
-Un byte de datos es aquel que tiene su MSB (\textit{Most Significant Bit}, bit más significativo) igual a cero. Es decir que su rango está entre \texttt{0x00} (0 decimal) y \texttt{0x0F} (127 decimal). Por el contrario, un byte de estado tiene su MSB igual a uno, por lo que su rango oscila entre \texttt{0x80} (128 decimal) y \texttt{0xFF} (255  decimal).
+Un byte de datos es aquel que tiene su MSB (\textit{Most Significant Bit}, bit más significativo) igual a cero. Es decir, su rango está entre 0 (\texttt{0x00}) y 127 (\texttt{0x7F}). Por el contrario, un byte de estado tiene su MSB igual a uno, por lo que su rango oscila entre 128 (\texttt{0x80}) y 255 (\texttt{0xFF}).
 
-El propósito de un byte de estado es el de actuar como encabezado, identificando el tipo de mensaje MIDI. Este consistirá de un byte de estado, seguido de:
+El propósito de un byte de estado es actuar como encabezado que identifica el tipo de mensaje MIDI. Cada mensaje estará formado por un byte de estado seguido de:
 \begin{enumerate}
 	\item Ningún byte de dato.
 	\item Un byte de dato.
 	\item Dos bytes de dato.
-	\item Múltiple bytes de dato.
+	\item Múltiples bytes de dato.
 \end{enumerate}
 
-En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posible casos.
+En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posibles casos.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/structure-midi-message.png}
-	\caption{}
+	\caption{Posibles estructuras de un mensaje MIDI.}
 	\label{fig:structure-midi-message}
 \end{figure}
+
+La cantidad de bytes de datos depende únicamente del tipo de mensaje. El estándar define dos categorías principales: mensajes de canal (Channel Messages) y mensajes de sistema (System Messages). En la figura \ref{fig:midi-messages} se observa un diagrama jerárquico de todos los tipos de mensajes.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/midi-messages.png}
+	\caption{Tipos de mensajes MIDI.}
+	\label{fig:midi-messages}
+\end{figure}
+
+Para entender la diferencia entre un mensaje de canal y uno de sistema es necesario introducir el concepto de canal. Un canal MIDI es un número del 1 al 16 (codificado en el nibble menos significativo del byte de estado, con valores en el rango \texttt{0x0-0xF}) que permite identificar de manera lógica a un instrumento o grupo de instrumentos. En consecuencia, es posible controlar hasta dieciséis canales distintos con un mismo controlador. Más de un equipo puede compartir el mismo canal, en cuyo caso todos reaccionarán ante los mismos mensajes.
+
+En base a lo expuesto anteriormente, la diferencia entre un mensaje de canal y uno de sistema es que los primeros permiten enviar instrucciones a instrumentos asociados a canales específicos, mientras que los segundos operan de manera global sobre todo el sistema MIDI, independientemente de los canales utilizados.
+
+La siguiente jerarquía de categorización se lista únicamente a modo explicativo:
+\begin{itemize}
+	\item Channel Voice Messages: controlan las voces de un instrumento, entendiendo por voz el sonido que genera.
+	\item Channel Mode Messages: determinan cómo debe ser la respuesta del instrumento frente a los Voice Messages.
+	\item System Common Messages: son mensajes de sistema generales que se aplican sobre todos los receptores.
+	\item System Real Time Messages: son mensajes orientados a sincronizar instrumentos que disponen de algún mecanismo de reloj.
+	\item System Exclusive Messages: son mensajes de longitud variable, pensados para que los fabricantes puedan transmitir información propietaria que no está contemplada en el estándar.
+\end{itemize}
+
+En la tabla \ref{tab:channel-messages} se listan los mensajes de canal.
+\begin{table}[h]
+	\centering
+	\caption[Mensajes de canal.]{Mensajes de canal. El número de canal \texttt{n} se codifica en el nibble menos significativo del byte de estado.}
+	\label{tab:channel-messages}
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Nombre}   & \textbf{ID (hexa)} & \textbf{Status Byte (binario)} & \textbf{\# Data Bytes} \\
+		\midrule
+		Note Off          & \texttt{0x8n}       & \texttt{1000'nnnn}              & 2                      \\
+		Note On           & \texttt{0x9n}       & \texttt{1001'nnnn}              & 2                      \\
+		Aftertouch        & \texttt{0xAn}       & \texttt{1010'nnnn}              & 2                      \\
+		Control Change    & \texttt{0xBn}       & \texttt{1011'nnnn}              & 2                      \\
+		Program Change    & \texttt{0xCn}       & \texttt{1100'nnnn}              & 1                      \\
+		Channel Pressure  & \texttt{0xDn}       & \texttt{1101'nnnn}              & 1                      \\
+		Pitch Bend Change & \texttt{0xEn}       & \texttt{1110'nnnn}              & 2                      \\
+		\bottomrule
+		\hline
+	\end{tabular}
+\end{table}
+
+Finalmente, en la tabla \ref{tab:system-messages} se listan los mensajes de sistema.
+\begin{table}[h]
+	\centering
+	\caption[Mensajes de sistema.]{Mensajes de sistema.}
+	\label{tab:system-messages}
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Nombre}                & \textbf{ID (hexa)} & \textbf{Status Byte (binario)} & \textbf{\# Data Bytes} \\
+		\midrule
+		SOX: Start of System Exclusive & \texttt{0xF0}      & \texttt{1111'0000}             & N                      \\
+		MIDI Time Code Quarter Frame   & \texttt{0xF1}      & \texttt{1111'0001}             & 1                      \\
+		Song Position Pointer          & \texttt{0xF2}      & \texttt{1111'0010}             & 2                      \\
+		Song Select                    & \texttt{0xF3}      & \texttt{1111'0011}             & 1                      \\
+		Tune Request                   & \texttt{0xF6}      & \texttt{1111'0110}             & 0                      \\
+		EOX: End of System Exclusive   & \texttt{0xF7}      & \texttt{1111'0111}             & 0                      \\
+		Timing Clock                   & \texttt{0xF8}      & \texttt{1111'1000}             & 0                      \\
+		Start                          & \texttt{0xFA}      & \texttt{1111'1010}             & 0                      \\
+		Continue                       & \texttt{0xFB}      & \texttt{1111'1011}             & 0                      \\
+		Stop                           & \texttt{0xFC}      & \texttt{1111'1100}             & 0                      \\
+		Active Sensing                 & \texttt{0xFE}      & \texttt{1111'1110}             & 0                      \\
+		System Reset                   & \texttt{0xFF}      & \texttt{1111'1111}             & 0                      \\
+		\bottomrule
+		\hline
+	\end{tabular}
+\end{table}
+
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 
 \section{Hardware de desarrollo} % 1 página
+
+\subsection{Microcontrolador y kit de desarrollo}
+Para desarrollar el equipo, el requerimiento más importante del microcontrolador es que disponga de suficientes puertos serie, también denominados UART (\textit{Universal Asynchronous Receiver-Transmitter}, Transmisor-Receptor Asíncrono Universal). Durante el proceso de búsqueda se encontró el microcontrolador STM32F413ZH de la firma STMicroelectronics. Sus principales características se listan en la tabla \ref{tab:stm32f413zh-traits}\cite{st:stm32f413-ds}.
+
+\begin{table}[h]
+	\centering
+	\caption{Características principales del microcontrolador STM32F413ZH.}
+	\label{tab:stm32f413zh-traits}
+	\begin{tabular}{lc}
+		\toprule
+		\textbf{Característica} & \textbf{Especificación} \\
+		\midrule
+		Núcleo                  & ARM Cortex-M4F          \\
+		Frecuencia máxima       & 100 MHz                 \\
+		Memoria flash           & 1.5 Mbytes              \\
+		Memoria RAM             & 320 Kbytes              \\
+		Cantidad de UARTs       & 10                      \\
+		Canales de DMA          & 16                      \\
+		Conectividad USB        & 2.0 OTG FS              \\
+		\bottomrule
+		\hline
+	\end{tabular}
+\end{table}
+
+Puede observarse que dispone de 10 interfaces UART, lo que cumple con los requerimientos del trabajo. Además, el microcontrolador posee 16 canales de DMA (\textit{Direct Memory Access}, Acceso Directo a Memoria). Esto implica que las transferencias de los datos recibidos o a enviar no requieren intervención directa del procesador, maximizando el rendimiento. Finalmente, también existe un periférico USB (\textit{Universal Serial Bus}, Bus Serie Universal), por lo que es viable establecer una comunicación con computadoras.
+
+El fabricante comercializa un kit de desarrollo basado en este microcontrolador, llamado NUCLEO-F413ZH\cite{st:um1974}. En la figura \ref{fig:nucleo-f413} se observa una fotografía del mismo.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[height=0.25\textheight]{./Figures/stm32-nucleo-f413.png}
+	\caption{Kit de desarrollo NUCLEO-F413ZH\protect\footnotemark.}
+	\label{fig:nucleo-f413}
+\end{figure}
+
+\footnotetext{Imagen tomada de \url{https://www.st.com/en/evaluation-tools/nucleo-f413zh.html}.}
+
+\subsection{Conversor Serie-USB}
+Dado que MIDI es un estándar basado en comunicación serie, para la etapa inicial del trabajo se han utilizado ocho conversores Serie-USB basados en el CH340G. En la figura \ref{fig:usb-serial} se observa una fotografía del mismo.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.4\textwidth]{./Figures/usb-serial.png}
+	\caption{Conversor Serie-USB basado en el CH340G\protect\footnotemark.}
+	\label{fig:usb-serial}
+\end{figure}
+
+\footnotetext{Imagen tomada de \url{https://www.openhacks.com/page/productos/id/1179/title/CH340G-USB-to-Serial-(TTL)-Module-Adapter}.}
+
 
 %----------------------------------------------------------------------------------------
 
@@ -50,10 +169,48 @@ En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posible c
 
 \section{Herramientas de desarrollo de firmware} % 1 página
 
-%----------------------------------------------------------------------------------------
+\subsection{Toolchain utilizado}
+Se optó por utilizar el lenguaje C++20 para el desarrollo de la aplicación principal, mientras que las bibliotecas de terceros están desarrolladas en C. Para ambos casos se empleó ARM GNU Toolchain, versión 14.3, como herramienta de compilación cruzada para la arquitectura Arm. Este conjunto de herramientas provee, entre otras, las siguientes utilidades:
+\begin{itemize}
+    \item Compiladores: \texttt{gcc} y \texttt{g++}
+	\item Enlazador: \texttt{ld}
+	\item Ensamblador: \texttt{as}
+	\item Depurador: \texttt{gdb}
+\end{itemize}
+
+\subsection{Biblioteca HAL}
+
+Para simplificar el acceso a los periféricos del microcontrolador se empleó la biblioteca HAL (\textit{Hardware Abstraction Layer}, Capa de Abstracción de Hardware) provista por STMicroelectronics\cite{st:um1725}. Esta biblioteca ofrece una capa de abstracción sobre el hardware del STM32F413 a través de una interfaz de programación en C que encapsula el manejo directo de registros y agrupa la funcionalidad de cada periférico en módulos coherentes (por ejemplo, GPIO, UART, SPI, temporizadores y DMA).
+
+El uso de la HAL permite reducir el tiempo de desarrollo y mejorar la portabilidad del código entre distintos microcontroladores de la misma familia, ya que mantiene una interfaz de alto nivel relativamente uniforme. En este proyecto se utilizó la HAL para la inicialización del reloj del sistema, la configuración de las interfaces de comunicación digital y la gestión de interrupciones asociadas, manteniendo el código de aplicación desacoplado de los detalles específicos del dispositivo.
+
+\subsection{Biblioteca USB}
+
+Además de la capa de abstracción de hardware, en este trabajo se integró la biblioteca de dispositivo USB provista por STMicroelectronics. Esta biblioteca implementa el stack de protocolo USB en modo device e incluye el soporte para la enumeración, la gestión de endpoints y el manejo de las transferencias de datos mediante una interfaz de programación en C.
+
+La utilización de esta biblioteca permitió incorporar una interfaz de comunicación USB entre el equipo y una computadora sin necesidad de desarrollar un stack desde cero. De este modo, el firmware de aplicación pudo concentrarse en el procesamiento de los mensajes y en la lógica específica del equipo mientras que la biblioteca se encarga de las tareas relacionadas con el protocolo USB y sus detalles de bajo nivel.
+
+\subsection{Sistema operativo en tiempo real FreeRTOS}
+
+Como sistema operativo en tiempo real se utilizó FreeRTOS, un kernel ampliamente difundido en sistemas embebidos de recursos acotados. FreeRTOS proporciona mecanismos de planificación de tareas, colas de mensajes, semáforos y temporizadores de software, entre otros servicios básicos necesarios para estructurar aplicaciones concurrentes sobre microcontroladores.
 
 %----------------------------------------------------------------------------------------
 
-\section{Framework para el desarrollo del software} % 1 página
+%----------------------------------------------------------------------------------------
+
+\section{Framework para el desarrollo del software}
+
+Para el desarrollo de la aplicación de escritorio se empleó Qt 6 como framework principal. Qt provee un conjunto de bibliotecas en C++ orientadas al desarrollo de interfaces gráficas y aplicaciones multiplataforma, lo que facilita la ejecución de un mismo código en distintos sistemas operativos de escritorio sin cambios significativos.
+
+La interfaz de usuario se implementó mediante QML (Qt Modeling Language), un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, simplificando el mantenimiento y la evolución futura de la aplicación.
+
+%----------------------------------------------------------------------------------------
+
+\section{Herramientas para el diseño del hardware}
+
+El diseño de las placas de circuito impreso (PCB) se realizó utilizando KiCad, una suite de software de automatización de diseño electrónico que permite la captura esquemática y el ruteo de placas multicapa, así como la generación de los archivos de fabricación correspondientes.
+
+Por otro lado, el diseño del gabinete se llevó a cabo con Autodesk Fusion 360. Esta herramienta de modelado tridimensional permitió definir la geometría del gabinete, verificar el ajuste mecánico de las placas y conectores, y generar los archivos necesarios para la fabricación del gabinete.
+
 
 %----------------------------------------------------------------------------------------
