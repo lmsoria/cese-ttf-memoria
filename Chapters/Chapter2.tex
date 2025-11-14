@@ -11,7 +11,7 @@ En este capítulo se describe brevemente cómo se codifican los mensajes MIDI de
 
 \section{Formato de mensajes MIDI} % 1 página
 
-El estándar MIDI se basa en el envío de datos a través de un puerto serie optoaislado que opera a una velocidad de 31250 baudios\cite{mma:midi_spec}. Para codificar los mensajes se establece, en primer lugar, una distinción entre dos tipos de bytes: de estado (\textit{Status Byte}) y de datos (\textit{Data Byte}). En la figura \ref{fig:midi-byte} se ilustra esta diferencia.
+El estándar MIDI se basa en el envío de datos a través de un puerto serie optoaislado que opera a una velocidad de 31250 baudios\cite{mma:midi_spec}. Para codificar los mensajes se establece, en primer lugar, una distinción entre dos tipos de bytes: de estado (Status Byte) y de datos (Data Byte). En la figura \ref{fig:midi-byte} se ilustra esta diferencia.
 
 \begin{figure}[ht]
 	\centering
@@ -20,7 +20,7 @@ El estándar MIDI se basa en el envío de datos a través de un puerto serie opt
 	\label{fig:midi-byte}
 \end{figure}
 
-Un byte de datos es aquel que tiene su MSB (\textit{Most Significant Bit}, bit más significativo) igual a cero. Es decir, su rango está entre 0 (\texttt{0x00}) y 127 (\texttt{0x7F}). Por el contrario, un byte de estado tiene su MSB igual a uno, por lo que su rango oscila entre 128 (\texttt{0x80}) y 255 (\texttt{0xFF}).
+Un byte de datos es aquel que tiene su MSB (\textit{Most Significant Bit}, Bit Más Significativo) igual a cero. Es decir, su rango está entre 0 (\texttt{0x00}) y 127 (\texttt{0x7F}). Por el contrario, un byte de estado tiene su MSB igual a uno, por lo que su rango oscila entre 128 (\texttt{0x80}) y 255 (\texttt{0xFF}).
 
 El propósito de un byte de estado es actuar como encabezado que identifica el tipo de mensaje MIDI. Cada mensaje estará formado por un byte de estado seguido de:
 \begin{enumerate}
@@ -32,7 +32,7 @@ El propósito de un byte de estado es actuar como encabezado que identifica el t
 
 En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posibles casos.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/structure-midi-message.png}
 	\caption{Posibles estructuras de un mensaje MIDI.}
@@ -41,7 +41,7 @@ En la figura \ref{fig:structure-midi-message} se ilustran estos cuatro posibles 
 
 La cantidad de bytes de datos depende únicamente del tipo de mensaje. El estándar define dos categorías principales: mensajes de canal (Channel Messages) y mensajes de sistema (System Messages). En la figura \ref{fig:midi-messages} se observa un diagrama jerárquico de todos los tipos de mensajes.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/midi-messages.png}
 	\caption{Tipos de mensajes MIDI.}
