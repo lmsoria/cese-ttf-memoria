@@ -16,7 +16,7 @@ El estándar MIDI se basa en el envío de datos a través de un puerto serie opt
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.5\textwidth]{./Figures/midi-byte.png}
-	\caption{Tipos de ``bytes'' según el estándar MIDI.}
+	\caption{Tipos de bytes según el estándar MIDI.}
 	\label{fig:midi-byte}
 \end{figure}
 
@@ -61,7 +61,7 @@ La siguiente jerarquía de categorización se lista únicamente a modo explicati
 	\item System Exclusive Messages: son mensajes de longitud variable, pensados para que los fabricantes puedan transmitir información propietaria que no está contemplada en el estándar.
 \end{itemize}
 
-En la tabla \ref{tab:channel-messages} se listan los mensajes de canal.
+En la tabla \ref{tab:channel-messages} se listan todos los mensajes de canal definidos por el estándar, incluyendo la cantidad de bytes de datos que posee cada uno de ellos.
 \begin{table}[h]
 	\centering
 	\caption[Mensajes de canal.]{Mensajes de canal. El número de canal \texttt{n} se codifica en el nibble menos significativo del byte de estado.}
@@ -82,7 +82,7 @@ En la tabla \ref{tab:channel-messages} se listan los mensajes de canal.
 	\end{tabular}
 \end{table}
 
-Finalmente, en la tabla \ref{tab:system-messages} se listan los mensajes de sistema.
+Finalmente, en la tabla \ref{tab:system-messages} se listan los mensajes de sistema. Puede observarse que \texttt{SOX} es el único tipo de mensaje que soporta el envío de una cantidad variable de bytes de datos.
 \begin{table}[h]
 	\centering
 	\caption[Mensajes de sistema.]{Mensajes de sistema.}
@@ -186,7 +186,7 @@ El uso de la HAL permite reducir el tiempo de desarrollo y mejorar la portabilid
 
 \subsection{Biblioteca USB}
 
-Además de la capa de abstracción de hardware, en este trabajo se integró la biblioteca de dispositivo USB provista por STMicroelectronics. Esta biblioteca implementa el stack de protocolo USB en modo device e incluye el soporte para la enumeración, la gestión de endpoints y el manejo de las transferencias de datos mediante una interfaz de programación en C.
+Además de la biblioteca HAL, en este trabajo se integró la biblioteca de dispositivo USB provista por STMicroelectronics. Esta biblioteca implementa el stack de protocolo USB en modo device e incluye el soporte para la enumeración, la gestión de endpoints y el manejo de las transferencias de datos mediante una interfaz de programación en C.
 
 La utilización de esta biblioteca permitió incorporar una interfaz de comunicación USB entre el equipo y una computadora sin necesidad de desarrollar un stack desde cero. De este modo, el firmware de aplicación pudo concentrarse en el procesamiento de los mensajes y en la lógica específica del equipo mientras que la biblioteca se encarga de las tareas relacionadas con el protocolo USB y sus detalles de bajo nivel.
 

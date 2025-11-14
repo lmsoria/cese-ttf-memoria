@@ -55,7 +55,7 @@ Al incrementar la cantidad de equipos se dificulta la interconexión entre ellos
 	\label{fig:ad-hoc}
 \end{figure}
 
-Debido a que la salida MIDI THRU replica la señal recibida por MIDI IN, el secuenciador únicamente puede gestionar los sintetizadores 2, 3 y 4, mientras que el controlador queda limitado al sintetizador 1. Invertir esta estructura de control requiere modificar el cableado, una tarea poco conveniente desde el punto de vista operativo y susceptible a generar errores..
+Debido a que la salida MIDI THRU replica la señal recibida por MIDI IN, el secuenciador únicamente puede gestionar los sintetizadores 2, 3 y 4, mientras que el controlador queda limitado al sintetizador 1. Invertir esta estructura de control requiere modificar el cableado, una tarea poco conveniente desde el punto de vista operativo y susceptible a generar errores.
 
 Una solución a esta problemática es la incorporación de un router MIDI, que dispone de múltiples entradas y salidas independientes. Al interconectar los equipos a través de él se obtiene una topología en estrella, con el router como nodo central. En la figura \ref{fig:centralizada} se muestran los mismos equipos de la figura \ref{fig:ad-hoc} conectados a través del router.
 
@@ -124,7 +124,7 @@ Esta solución de la firma estadounidense Conductive Labs posee once entradas y 
 \footnotetext{Imagen tomada de \url{https://conductivelabs.com/mrcc/?v=c582dec943ff}.}
 
 \subsection{iConnectivity mioXL}
-Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, también ofrece opciones avanzadas de ``routeo'' y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se presenta una fotografía del producto.
+Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, también ofrece opciones avanzadas de routeo y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se presenta una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
@@ -135,9 +135,10 @@ Esta solución de la firma estadounidense iConnectivity posee ocho entradas y do
 
 \footnotetext{Imagen tomada de \url{https://www.iconnectivity.com/mioxl}.}
 
+\subsection{Comparativa de las alternativas}
+\label{sec:comparativa-alternativas}
 
-\subsection{Comparativa de las alternartivas}
-Luego de mostrar algunas alternativas comerciales, se recopila en la tabla \ref{tab:comparativa-modelos} la lista de características analizada de cada una de ellas, agregando también el costo del producto en dólares estadounidenses.
+Luego de presentar algunas alternativas comerciales, en la tabla \ref{tab:comparativa-modelos} se sintetizan las principales características de cada una de ellas, incluyendo el costo aproximado de los productos en dólares estadounidenses.
 
 \begin{table}[h]
 	\centering
@@ -151,19 +152,25 @@ Luego de mostrar algunas alternativas comerciales, se recopila en la tabla \ref{
 			\midrule
 			Kenton THRU-12 & 1 & 12 & No & No & - & \$ 150 \\
 			MIDI Solutions Quadra Merge & 4 & 2 & No & No & - & \$ 175 \\
-			Conductive Labs MRCC & 11 & 17 & Si & Si & \textit{Stand-alone} & \$ 439 \\
-			iConnectivity mioXL & 8 & 12 & Si & Si & Aplicación & \$ 500 \\
+			Conductive Labs MRCC & 11 & 17 & Sí & Sí & \textit{Stand-alone} & \$ 439 \\
+			iConnectivity mioXL & 8 & 12 & Sí & Sí & Aplicación & \$ 500 \\
 			\bottomrule
 			\hline
 		\end{tabular}
 	}
 \end{table}
 
+Desde una perspectiva funcional, puede observarse que dispositivos como el THRU-12 y el Quadra Merge abordan de manera parcial la problemática descripta en la sección \ref{problematica}. El primero se limita a distribuir una única entrada hacia múltiples salidas. El segundo permite combinar varias entradas en un número reducido de salidas. En ambos casos se carece de mecanismos de filtrado y de opciones de configuración avanzadas.
+
+Por su parte, productos como el MRCC y el mioXL incorporan un conjunto más amplio de funcionalidades. Estas prestaciones los convierten en equipos muy versátiles, adecuados para escenarios complejos en los que se requiere una gestión detallada del flujo de mensajes MIDI, aunque a la vez implican una mayor complejidad de uso y de configuración.
+
+En síntesis, las alternativas revisadas tienden a ubicarse en dos extremos: por un lado, soluciones relativamente simples, orientadas a la distribución o combinación básica de señales sin capacidades de configuración; por otro lado, sistemas de alta complejidad que ofrecen un control exhaustivo del routeo y del filtrado. Permanece abierto, por lo tanto, un espacio intermedio para dispositivos que ofrezcan varias entradas y salidas físicas junto con funciones de routeo y filtrado configurables, pero con una interfaz de usuario más acotada y directa.
+
 %----------------------------------------------------------------------------------------
 
 \section{Motivación del trabajo} \label{motivacion}
 
-En la sección \ref{estado-arte} se mostraron algunas alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente thru boxes), adecuados para replicación de señales, pero insuficientes cuando se requiere ``routeo'' selectivo entre entradas y salidas o filtrado por tipo de mensaje.
+En la subsección \ref{sec:comparativa-alternativas} se presentó una comparación entre algunas alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente thru boxes), adecuados para replicación de señales, pero insuficientes cuando se requiere routeo selectivo entre entradas y salidas o filtrado por tipo de mensaje.
 
 En consecuencia se planteó el desafío de desarrollar una versión local de menor costo que:
 \begin{itemize}
@@ -177,13 +184,17 @@ Finalmente, cabe destacar que pese a que la motivación de este trabajo fue pers
 %----------------------------------------------------------------------------------------
 
 \section{Objetivos y alcance}
+\label{objetivos-alcance}
 
-Se planteó como objetivo de este trabajo el desarrollo integral del prototipo de un \textit{router} MIDI de cuatro entradas y ocho salidas. Esto implicó cubrir los siguientes puntos:
+El objetivo general de este trabajo fue el desarrollo integral del prototipo de un router MIDI de cuatro entradas y ocho salidas, capaz de gestionar el flujo de mensajes entre ellas mediante funciones de routeo y filtrado configurables.
+
+Para alcanzar este objetivo general se definieron los siguientes objetivos específicos:
 \begin{itemize}
-	\item Diseñar y ensamblar el circuito electrónico del equipo.
-	\item Desarrollar el firmware para brindar la funcionalidad deseada.
-	\item Desarrollar una aplicación para controlar al equipo.
-	\item Diseñar un gabinete donde se alojen las placas.
+	\item Diseñar y ensamblar el circuito electrónico del equipo, incluyendo las etapas de interfaz MIDI, procesamiento y alimentación.
+	\item Desarrollar el firmware embebido que implemente las funciones de recepción, procesamiento, routeo y filtrado de mensajes MIDI, así como el almacenamiento de configuraciones.
+	\item Desarrollar una aplicación de escritorio que permita configurar el equipo, supervisar su estado de funcionamiento y gestionar las distintas configuraciones de routeo y filtrado.
+	\item Diseñar un gabinete que aloje las placas electrónicas y los conectores, adecuado para su instalación en entornos de estudio y preparado para su eventual montaje en un rack estándar.
+	\item Verificar el funcionamiento del sistema mediante ensayos representativos, incluyendo pruebas de comunicación, de estabilidad y de latencia.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
