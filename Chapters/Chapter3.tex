@@ -45,11 +45,163 @@ Todos los capítulos deben comenzar con un breve párrafo introductorio que indi
 
 \section{Diagrama en bloques del sistema} % 1 página
 
+
+
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 
 \section{Desarrollo del firmware} % 1 página
+
+\subsection{Arquitectura del firmware}
+Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capas con diferentes niveles de abstracción. En la figura \ref{fig:fw-layers} se ilustra la segmentación realizada.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.55\textwidth]{./Figures/fw-layers.png}
+	\caption{Arquitectura de capas utilizada.}
+	\label{fig:fw-layers}
+\end{figure}
+
+A continuación se detalla la funcionalidad de cada una de ellas:
+\begin{itemize}
+	\item \texttt{Hardware}: No es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
+	\item \texttt{ST HAL}: Es la biblioteca HAL ofrecida por el fabricante del microcontrolador. Se la usa para configurar el reloj del sistema y los periféricos utilizados.
+	\item \texttt{freeRTOS}: Es la biblioteca de freeRTOS, también desarrollada por terceros
+	\item \texttt{os}: Es un wrapper en C++ de que de primitivas de kernel tales como colas, tareas o timers, entre otras. Su funcionalidad es que sea agnóstica del sistema operativo utilizado.
+	\item \texttt{hal}: Es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
+	\item \texttt{svc}: Capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas.
+	\item \texttt{app}: Capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware.
+\end{itemize}
+
+
+En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/fw-arch.png}
+	\caption{Diagrama en bloques de la aplicación embebida.}
+	\label{fig:fw-arch}
+\end{figure}
+
+La aplicación consiste en cinco tipos de servicios o sistemas interactuando entre sí:
+\begin{enumerate}
+	\item \texttt{svc::dial}: Es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
+	\item \texttt{svc::led}: Controla los LEDs del panel frontal.
+	\item \texttt{svc::storage}: Se encarga de leer y escribir la configuración de la aplicación en la memoria interna del microcontrolador.
+	\item \texttt{svc::comms}: Gestiona la comunicación con la computadora. Es la encargada de serializar y deserializar los comandos establecidos por el protocolo diseñado para la comunicación entre el firmware y el software.
+	\item \texttt{svc::io}: Es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas.
+\end{enumerate}
+
+Cada uno de estos servicios tendrá una serie de dependencias que necesitará para operar. La aplicación es la encargada de instanciarlas e inyectarlas.
+Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el despacho de eventos. Estos eventos son estructuras que pueden estar vacías o contener información relevante. La aplicación posee una tarea que monitorea el estado de una cola de eventos, para poder procesarlos de manera diferida.
+
+\subsection{Diseño del servicio de Dial}
+El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador. En la figura \ref{fig:rotary-encoder} se muestra una fotografía de un encoder típico, montado en una placa tipo breakout para prototipos.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.25\textwidth]{./Figures/rotary-encoder.jpg}
+	\caption{Encoder rotativo con pulsador\protect\footnotemark.}
+	\label{fig:rotary-encoder}
+\end{figure}
+
+\footnotetext{Imagen tomada de \url{https://thepihut.com/cdn/shop/articles/DSC_0700.jpg}.}
+
+Estos encoders poseen tres señales: una es el pulsador, y las otras dos, denominadas \texttt{CLK} y \texttt{DT}, generan una onda cuadrada desfasada 90 grados cuando el encoder rota. La fase relativa entre ambas señales determina el sentido de giro del dial.
+
+En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configuradas como entradas, aplicando mecanismos de antirrebote y procesamiento de la señal en cuadratura para determinar el estado del dial.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-dial.png}
+	\caption{Diagrama en bloques del servicio de Dial.}
+	\label{fig:svc-dial}
+\end{figure}
+
+Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos son enviados a la aplicación principal:
+\begin{itemize}
+	\item \texttt{ButtonPressed}: El botón ha sido apretado una sola vez.
+	\item \texttt{ButtonDoublePressed}: El botón ha sido apretado dos veces en una ventana de tiempo corta (configurable a través de una constante de compilación).
+	\item \texttt{ButtonLongPressed}: El botón ha sido apretado y retenido por un intervalo de tiempo largo (configurable a través de una constante de compilación).
+	\item \texttt{DialCW}: El encoder ha rotado en sentido horario.
+	\item \texttt{DialCCW}: El encoder ha rotado en sentido antihorario.
+\end{itemize}
+
+
+\subsection{Diseño del servicio de LEDs}
+El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs del panel frontal. En la figura \ref{fig:svc-led} se ilustra un diagrama en bloque de la estructura del servicio.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/svc-led.png}
+	\caption{Diagrama en bloques del servicio de LEDs.}
+	\label{fig:svc-led}
+\end{figure}
+
+El servicio consiste en una tarea que periódicamente refresca el estado de los LEDs. El uso de una tarea permite  realizar animaciones, definidas a través de una FSM (\textit{Finite State Machine}, Máquina de Estados Finitos) como la de la figura \ref{fig:svc-led-fsm}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-led-fsm.png}
+	\caption{Máquina de estados del servicio de LEDs.}
+	\label{fig:svc-led-fsm}
+\end{figure}
+
+Se definieron tres animaciones:
+\begin{enumerate}
+	\item \texttt{Startup}: Ocurre cuando el sistema inicializa. Hace un barrido por todos los LEDs, comenzando y terminando por el LED correspondiente al preset activo. Cuando finaliza la animación se transiciona al estado \texttt{Steady}.
+	\item \texttt{Steady}: Es el estado por defecto del sistema. Se mantiene encendido el LED correspondiente al preset activo. El servicio dispone de una función llamada \texttt{set\_active\_preset()} para poder actualizar el LED a encender.
+	\item \texttt{Blink}: Este estado se utiliza para indicarle al usuario que un preset ha sido guardado como activo, invocando el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
+\end{enumerate}
+
+\newpage
+
+\subsection{Diseño del servicio de almacenamiento}
+La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y escribir la configuración del sistema, modelada mediante la estructura \texttt{app::Settings}. En la figura \ref{fig:svc-storage} se ilustra un diagrama en bloques del servicio.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/svc-storage.png}
+	\caption{Diagrama en bloques del servicio de almacenamiento.}
+	\label{fig:svc-storage}
+\end{figure}
+
+\subsection{Diseño del servicio de I/O}
+El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encargado de procesar el flujo de mensajes MIDI desde las entradas hasta las salidas. En la figura \ref{fig:svc-io} se observa un diagrama en bloques del mismo.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-io.png}
+	\caption{Diagrama en bloques del servicio de I/O.}
+	\label{fig:svc-io}
+\end{figure}
+
+Dado que hay UARTs que operan como entrada o como entrada-salida, el servicio de I/O admite distintas especializaciones, determinadas por el parámetro \texttt{Mode}, que puede ser \texttt{Input} (solo entrada), \texttt{Output} (solo salida) o \texttt{InputOutput} (entrada y salida). Si el servicio admite entrada, se instanciará una tarea que se encarga de procesar los mensajes provenientes de la UART. Por otra parte, si el servicio admite salida, se instanciará una tarea que se encarga de procesar los mensajes recibidos y transmitirlos por la UART.
+
+El flujo de entrada-salida sigue un patrón de diseño conocido como segmentación de procesos. Este permite transformar datos de una representación a otra mientras se mueven secuencialmente desde un productor a un consumidor \cite{sommerville:ingenieria-sw}. Para ilustrar este concepto, en las figuras \ref{fig:svc-in-pipe} y \ref{fig:svc-out-pipe} se representan los flujos de datos en las tareas de recepción y transmisión de mensajes, respectivamente.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-in-pipe.png}
+	\caption{Flujo de datos para la recepción de mensajes MIDI.}
+	\label{fig:svc-in-pipe}
+\end{figure}
+
+La tarea de recepción involucra más pasos, ya que es necesario convertir la información binaria recibida por la UART en mensajes MIDI. Para ello, se cuenta con una clase llamada \texttt{app::Parser} encargada de convertir una secuencia de bytes en una secuencia de mensajes MIDI. Una vez detectados los tipos de mensaje recibidos, se procede a filtrarlos. La clase \texttt{app::Filter} verifica en la configuración de usuario si el mensaje se encuentra bloqueado. En caso negativo, se transmite a la siguiente etapa, donde la clase \texttt{app::Router} consulta en la configuración a qué salidas debe propagarse. Como los procesos de recepción y transmisión se gestionan en tareas diferentes, y dado que más de una tarea de entrada puede escribir en una tarea de salida, se utilizan colas de mensajes como mecanismo de sincronización para enviar los mensajes MIDI desde las entradas hacia las salidas. FreeRTOS garantiza que estas estructuras son aptas para situaciones de concurrencia \cite{freertos:queues}.
+
+
+El proceso de transmisión involucra menos pasos, tal como puede observarse en la figura \ref{fig:svc-out-pipe}. La tarea permanece bloqueada hasta que aparezcan mensajes en la cola. Ante la presencia de ellos se procede a consultar la configuración del filtro de la salida. Si el mensaje no debe ser bloqueado, se procede a transmitirlo por el puerto serie. Para ello es necesario serializar primero el mensaje, responsabilidad de la clase \texttt{app::Serializer}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-out-pipe.png}
+	\caption{Flujo de datos para la recepción de mensajes MIDI.}
+	\label{fig:svc-out-pipe}
+\end{figure}
+
+Una vez que serializado el mensaje, se copia su contenido en el buffer circular de la UART para su posterior transmisión, dando por finalizado el proceso.
+
+
+
 
 %----------------------------------------------------------------------------------------
 
