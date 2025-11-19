@@ -24,7 +24,7 @@ Este capítulo introduce la problemática de la interconexión de instrumentos m
 
 Dentro de los estudios de grabación y los entornos de producción musical es frecuente la presencia de múltiples instrumentos musicales electrónicos, principalmente sintetizadores y procesadores de efectos.
 
-Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}, Interfaz Digital de Instrumentos Musicales), que establece un mecanismo para la transferencia de información entre instrumentos, computadoras y otros dispositivos vinculados a la producción musical.
+Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}), que establece un mecanismo para la transferencia de información entre instrumentos, computadoras y otros dispositivos vinculados a la producción musical.
 
 Para garantizar una correcta interoperabilidad, MIDI no solo define el protocolo (es decir, el formato de los mensajes), sino también la conexión física entre ellos mediante la especificación de los cables y conectores que deben usarse.
 
@@ -33,13 +33,13 @@ En la especificación original, la \textit{MIDI Manufacturers Association} (MMA,
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.55\textwidth]{./Figures/din-connector.jpg}
-	\caption{Ejemplo de cable y conectores DIN-5 pertenecientes al panel trasero de un sintetizador\protect\footnotemark.}
+	\caption{Ejemplo de cables y conectores DIN-5 pertenecientes al panel trasero de un sintetizador\protect\footnotemark.}
 	\label{fig:din5}
 \end{figure}
 
 \footnotetext{Fotografía del autor.}
 
-A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar también menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
+A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar, también, menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
 
 \begin{figure}[ht]
 	\centering
@@ -85,12 +85,12 @@ En esta sección se presenta una lista general (pero no exhaustiva) de algunas d
 \begin{enumerate}
 	\item Kenton THRU-12.
 	\item MIDI Solutions Quadra Merge.
-	\item Conductive Labs MRCC
-	\item iConnectivity mioXL
+	\item Conductive Labs MRCC.
+	\item iConnectivity mioXL.
 \end{enumerate}
 
 \subsection{Kenton THRU-12}
-Desarrollado por la firma británica Kenton, este modelo posee una entrada que es replicada en sus doce salidas. Los equipos con este tipo de funcionalidad se conocen como thru boxes. En la figura \ref{fig:kenton} se muestra una fotografía del producto.
+Desarrollado por la firma británica Kenton, este modelo posee una entrada que es replicada en sus doce salidas \cite{kenton:thru5}. Los equipos con este tipo de funcionalidad se conocen como thru boxes. En la figura \ref{fig:kenton} se muestra una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
@@ -102,7 +102,7 @@ Desarrollado por la firma británica Kenton, este modelo posee una entrada que e
 \footnotetext{Imagen tomada de \url{https://kentonuk.com/product/thru-12/}.}
 
 \subsection{MIDI Solutions Quadra Merge}
-Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro entradas que se combinan y son redirigidas a dos salidas. Los equipos que fusionan varias entradas en una o más salidas son conocidos como merge boxes. En la figura \ref{fig:midi-solutions} se observa una fotografía del producto.
+Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro entradas que se combinan y son redirigidas a dos salidas \cite{midisolutions:quadra-thru}. Los equipos que fusionan varias entradas en una o más salidas son conocidos como merge boxes. En la figura \ref{fig:midi-solutions} se observa una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
@@ -114,7 +114,7 @@ Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro en
 \footnotetext{Imagen tomada de \url{https://midisolutions.com/prodqmr.htm}.}
 
 \subsection{Conductive Labs MRCC}
-Esta solución de la firma estadounidense Conductive Labs posee once entradas y diecisiete salidas. También ofrece opciones avanzadas de ruteo y filtrado de mensajes, configurables a través de una pantalla integrada. En la figura \ref{fig:mrcc} se muestra una fotografía del producto.
+Esta solución de la firma estadounidense Conductive Labs posee once entradas y diecisiete salidas \cite{conductivelabs:mrcc}.  También ofrece opciones avanzadas de ruteo y filtrado de mensajes, configurables a través de una pantalla integrada. En la figura \ref{fig:mrcc} se muestra una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
@@ -126,7 +126,7 @@ Esta solución de la firma estadounidense Conductive Labs posee once entradas y 
 \footnotetext{Imagen tomada de \url{https://conductivelabs.com/mrcc/?v=c582dec943ff}.}
 
 \subsection{iConnectivity mioXL}
-Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, también ofrece opciones avanzadas de ruteo y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se presenta una fotografía del producto.
+Esta solución de la firma estadounidense iConnectivity posee ocho entradas y doce salidas \cite{iconnectivity:mioxl}. También soporta MIDI sobre Ethernet y USB. Al igual que el producto anterior, ofrece opciones avanzadas de ruteo y filtrado de mensajes configurables desde una aplicación de escritorio. En la figura \ref{fig:mioxl} se presenta una fotografía del producto.
 
 \begin{figure}[ht]
 	\centering
@@ -140,7 +140,7 @@ Esta solución de la firma estadounidense iConnectivity posee ocho entradas y do
 \subsection{Comparativa de las alternativas}
 \label{sec:comparativa-alternativas}
 
-Luego de presentar algunas alternativas comerciales, en la tabla \ref{tab:comparativa-modelos} se sintetizan las principales características de cada una de ellas, incluyendo el costo aproximado de los productos en dólares estadounidenses.
+En la tabla \ref{tab:comparativa-modelos} se sintetizan las principales características de cada una de ellas, y además se incluye el costo aproximado de los productos en dólares estadounidenses.
 
 \begin{table}[h]
 	\centering
@@ -174,7 +174,7 @@ En síntesis, las alternativas revisadas tienden a ubicarse en dos extremos: por
 
 En la subsección \ref{sec:comparativa-alternativas} se presentó una comparación entre algunas alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente thru boxes), adecuados para replicación de señales, pero insuficientes cuando se requiere ruteo selectivo entre entradas y salidas o filtrado por tipo de mensaje.
 
-En consecuencia se planteó el desafío de desarrollar una versión local de menor costo que:
+En consecuencia, se planteó el desafío de desarrollar una versión local de menor costo que:
 \begin{itemize}
 	\item Soporte múltiples entradas y salidas DIN.
 	\item Soporte filtrado de mensajes.
