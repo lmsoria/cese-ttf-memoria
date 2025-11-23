@@ -24,7 +24,7 @@ Este capítulo introduce la problemática de la interconexión de instrumentos m
 
 Dentro de los estudios de grabación y los entornos de producción musical es frecuente la presencia de múltiples instrumentos musicales electrónicos, principalmente sintetizadores y procesadores de efectos.
 
-Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}), que establece un mecanismo para la transferencia de información entre instrumentos, computadoras y otros dispositivos vinculados a la producción musical.
+Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument Digital Interface}) \cite{mma:midi_spec}, que establece un mecanismo para la transferencia de información entre instrumentos, computadoras y otros dispositivos vinculados a la producción musical.
 
 Para garantizar una correcta interoperabilidad, MIDI no solo define el protocolo (es decir, el formato de los mensajes), sino también la conexión física entre ellos mediante la especificación de los cables y conectores que deben usarse.
 
@@ -33,13 +33,11 @@ En la especificación original, la MMA (\textit{MIDI Manufacturers Association})
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.55\textwidth]{./Figures/din-connector.jpg}
-	\caption{Ejemplo de cables y conectores DIN-5 pertenecientes al panel trasero de un sintetizador\protect\footnotemark.}
+	\caption{Ejemplo de cables y conectores DIN-5 pertenecientes al panel trasero de un sintetizador.}
 	\label{fig:din5}
 \end{figure}
 
-\footnotetext{Fotografía del autor.}
-
-A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar, también, menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
+A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar, también, menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain \cite{hass:midi_hardware}. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
 
 \begin{figure}[ht]
 	\centering
@@ -81,13 +79,7 @@ Actualmente existen diversas soluciones comerciales a nivel internacional. Para 
 	\item Configuración mediante PC o \textit{stand-alone}.
 \end{itemize}
 
-En esta sección se presenta una lista general (pero no exhaustiva) de algunas de las alternativas más populares:
-\begin{enumerate}
-	\item Kenton THRU-12.
-	\item MIDI Solutions Quadra Merge.
-	\item Conductive Labs MRCC.
-	\item iConnectivity mioXL.
-\end{enumerate}
+En esta sección se presenta una lista general (pero no exhaustiva) de algunas de las alternativas más populares.
 
 \subsection{Kenton THRU-12}
 Desarrollado por la firma británica Kenton, este modelo posee una entrada que es replicada en sus doce salidas \cite{kenton:thru5}. Los equipos con este tipo de funcionalidad se conocen como thru boxes. En la figura \ref{fig:kenton} se muestra una fotografía del producto.
@@ -116,7 +108,7 @@ Desarrollado por la firma canadiense MIDI Solutions, este modelo posee cuatro en
 \subsection{Conductive Labs MRCC}
 Esta solución de la firma estadounidense Conductive Labs posee once entradas y diecisiete salidas \cite{conductivelabs:mrcc}.  También ofrece opciones avanzadas de ruteo y filtrado de mensajes, configurables a través de una pantalla integrada. En la figura \ref{fig:mrcc} se muestra una fotografía del producto.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./Figures/mrcc.png}
 	\caption{Conductive Labs MRCC\protect\footnotemark.}
@@ -162,15 +154,12 @@ En la tabla \ref{tab:comparativa-modelos} se sintetizan las principales caracter
 	}
 \end{table}
 
-Desde una perspectiva funcional, puede observarse que dispositivos como el THRU-12 y el Quadra Merge abordan de manera parcial la problemática descripta en la sección \ref{problematica}. El primero se limita a distribuir una única entrada hacia múltiples salidas. El segundo permite combinar varias entradas en un número reducido de salidas. En ambos casos se carece de mecanismos de filtrado y de opciones de configuración avanzadas.
-
-Por su parte, productos como el MRCC y el mioXL incorporan un conjunto más amplio de funcionalidades. Estas prestaciones los convierten en equipos muy versátiles, adecuados para escenarios complejos en los que se requiere una gestión detallada del flujo de mensajes MIDI, aunque a la vez implican una mayor complejidad de uso y de configuración.
-
-En síntesis, las alternativas revisadas tienden a ubicarse en dos extremos: por un lado, soluciones relativamente simples, orientadas a la distribución o combinación básica de señales sin capacidades de configuración; por otro lado, sistemas de alta complejidad que ofrecen un control exhaustivo del ruteo y del filtrado. Permanece abierto, por lo tanto, un espacio intermedio para dispositivos que ofrezcan varias entradas y salidas físicas junto con funciones de ruteo y filtrado configurables, pero con una interfaz de usuario más acotada y directa.
+Desde una perspectiva funcional, puede observarse que dispositivos como el THRU-12 y el Quadra Merge ofrecen soluciones acotadas a la distribución o combinación de señales, sin capacidades de filtrado ni opciones de configuración avanzadas. En el extremo opuesto, productos como el MRCC y el mioXL brindan ruteo y filtrado configurables, adecuándose a escenarios complejos a costa de una mayor complejidad de uso. En consecuencia, permanece un espacio intermedio para dispositivos que combinen varias entradas y salidas físicas, funciones básicas de ruteo y filtrado y una interfaz de usuario más directa.
 
 %----------------------------------------------------------------------------------------
 
-\section{Motivación del trabajo} \label{motivacion}
+\section{Motivación del trabajo}
+\label{motivacion}
 
 En la subsección \ref{sec:comparativa-alternativas} se presentó una comparación entre algunas alternativas comerciales. Cada una de ellas ofrece distintos niveles de flexibilidad respecto a la cantidad de entradas y salidas, o a la capacidad de configuración. No obstante, su adquisición en el contexto nacional enfrenta barreras asociadas a costos finales, logística de importación y soporte posventa. En contraste, la oferta local se concentra en dispositivos de baja complejidad (principalmente thru boxes), adecuados para replicación de señales, pero insuficientes cuando se requiere ruteo selectivo entre entradas y salidas o filtrado por tipo de mensaje.
 
@@ -188,7 +177,7 @@ Finalmente, cabe destacar que pese a que la motivación de este trabajo fue pers
 \section{Objetivos y alcance}
 \label{objetivos-alcance}
 
-El objetivo general de este trabajo fue el desarrollo integral del prototipo de un router MIDI de cuatro entradas y ocho salidas, capaz de gestionar el flujo de mensajes entre ellas mediante funciones de ruteo y filtrado configurables.
+El objetivo general de este trabajo fue desarrollar el prototipo de un router MIDI de cuatro entradas y ocho salidas, capaz de gestionar el flujo de mensajes mediante funciones de ruteo y filtrado configurables.
 
 Para alcanzar este objetivo general se definieron los siguientes objetivos específicos:
 \begin{itemize}
