@@ -2,8 +2,7 @@
 
 \label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
-
+En este capítulo se detalla el proceso de desarrollo del equipo, incluyendo la arquitectura de la solución como sistema, el firmware embebido, la aplicación de escritorio y el hardware que constituye el router.
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -43,17 +42,44 @@ Todos los capítulos deben comenzar con un breve párrafo introductorio que indi
 
 %----------------------------------------------------------------------------------------
 
-\section{Diagrama en bloques del sistema} % 1 página
+\section{Diagrama en bloques del sistema} \label{diagrama-bloques-sistema}
+El trabajo desarrollado consiste en dos grandes bloques. Por un lado se encuentra el firmware (que corre en la plataforma de hardware), y por el otro lado software que corre nativamente en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.75\textwidth]{./Figures/system-arch.png}
+	\caption{Diagrama en bloques del trabajo realizado.}
+	\label{fig:sys-arch}
+\end{figure}
 
+El firmware se encarga de realizar íntegramente el procesamiento del flujo de datos (mensajes MIDI), mientras que el software actúa como interfaz de configuración del comportamiento del equipo. La comunicación entre ambas es mediante un puerto serie virtual, emulado por la interfaz USB del microcontrolador. A través de una serie de comandos, se modifican las propiedades de una estructura que modela el comportamiento de la aplicación (\texttt{Settings}). En la figura \ref{fig:app-settings} se muestra un diagrama de clases listando todas las estructuras que componen a este modelo.
 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.75\textwidth]{./Figures/app-settings.png}
+	\caption{Diagrama en clases de las estructuras de datos principales de la aplicación.}
+	\label{fig:app-settings}
+\end{figure}
+
+Recorriendo el diagrama de menor a mayor jerarquía, se encuentran las siguientes estructuras:
+\begin{itemize}
+	\item \texttt{Version}: Se utiliza para versionar la imagen de firmware.
+	\item \texttt{SystemFilters}: Representa mediante un \texttt{std::bitset} \cite{cppreference:bitset} de 11 bits si los mensajes de sistema deben ser filtrados o no (un bit por cada tipo de mensaje).
+	\item \texttt{ChannelFilters}: Cumple la misma funcionalidad que \texttt{SystemFilters}, con la salvedad de que, como los mensajes de canal tienen un canal asociado, esta estructura es un arreglo de dieciséis \texttt{std::bitset} de 7 bits.
+	\item \texttt{RouterSettings}: El ruteo entre entradas y salidas también se modela con un \texttt{std::bitset}. Dado que el sistema posee 4 entradas y 8 salidas, esta estructura es un arreglo de cuatro \texttt{std::bitset} de 8 bits.
+	\item \texttt{IOSettings}: Esta estructura encapsula todas las propiedades que se pueden modificar en las entradas y salidas: un nombre, la configuración de filtros y si se encuentra habilitada o no.
+	\item \texttt{Preset}: Contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además se le agrega un nombre para que el usuario también pueda identificarla.
+	\item \texttt{Settings}: Contiene el estado de los dieciséis preset, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
+\end{itemize}
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 
-\section{Desarrollo del firmware} % 1 página
+\section{Desarrollo del firmware} \label{desarrollo-firmware}
 
-\subsection{Arquitectura del firmware}
+En esta sección se describe la arquitectura del firmware y los componentes que lo integran.
+
+\subsection{Arquitectura del firmware} \label{arquitectura-firmware}
 Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capas con diferentes niveles de abstracción. En la figura \ref{fig:fw-layers} se ilustra la segmentación realizada.
 
 \begin{figure}[ht]
@@ -66,14 +92,15 @@ Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capa
 A continuación se detalla la funcionalidad de cada una de ellas:
 \begin{itemize}
 	\item \texttt{Hardware}: No es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
-	\item \texttt{ST HAL}: Es la biblioteca HAL ofrecida por el fabricante del microcontrolador. Se la usa para configurar el reloj del sistema y los periféricos utilizados.
-	\item \texttt{freeRTOS}: Es la biblioteca de freeRTOS, también desarrollada por terceros
-	\item \texttt{os}: Es un wrapper en C++ de que de primitivas de kernel tales como colas, tareas o timers, entre otras. Su funcionalidad es que sea agnóstica del sistema operativo utilizado.
+	\item \texttt{ST HAL}: Es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se contempla tambien la biblioteca USB desarrollada por ST.
+	\item \texttt{freeRTOS}: Es la biblioteca de freeRTOS, también desarrollada por terceros \cite{freertos:rtos-book}.
+	\item \texttt{os}: Es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
 	\item \texttt{hal}: Es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
-	\item \texttt{svc}: Capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas.
-	\item \texttt{app}: Capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware.
+	\item \texttt{svc}: Capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, más relacionadas con los requerimientos de la aplicación.
+	\item \texttt{app}: Capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
 \end{itemize}
 
+\newpage
 
 En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
 
@@ -87,14 +114,16 @@ En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa
 La aplicación consiste en cinco tipos de servicios o sistemas interactuando entre sí:
 \begin{enumerate}
 	\item \texttt{svc::dial}: Es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
-	\item \texttt{svc::led}: Controla los LEDs del panel frontal.
+	\item \texttt{svc::led}: Controla los LEDs del panel frontal, con la intención principal de indicar el número de preset activo.
 	\item \texttt{svc::storage}: Se encarga de leer y escribir la configuración de la aplicación en la memoria interna del microcontrolador.
 	\item \texttt{svc::comms}: Gestiona la comunicación con la computadora. Es la encargada de serializar y deserializar los comandos establecidos por el protocolo diseñado para la comunicación entre el firmware y el software.
-	\item \texttt{svc::io}: Es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas.
+	\item \texttt{svc::io}: Es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes
 \end{enumerate}
 
-Cada uno de estos servicios tendrá una serie de dependencias que necesitará para operar. La aplicación es la encargada de instanciarlas e inyectarlas.
-Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el despacho de eventos. Estos eventos son estructuras que pueden estar vacías o contener información relevante. La aplicación posee una tarea que monitorea el estado de una cola de eventos, para poder procesarlos de manera diferida.
+Cada uno de estos servicios tiene una serie de dependencias que necesita para operar correctamente. La aplicación es la encargada de instanciarlas e inyectarlas.
+Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el patrón de Objeto Activo \cite{lavender-schmidt:active-object}, en donde una tarea monitorea el estado de una cola de eventos que son procesados de manera diferida. Estos eventos son estructuras de datos generadas asincrónicamente por los servicios, y pueden contener o no información asociada.
+
+\newpage
 
 \subsection{Diseño del servicio de Dial}
 El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador. En la figura \ref{fig:rotary-encoder} se muestra una fotografía de un encoder típico, montado en una placa tipo breakout para prototipos.
@@ -110,7 +139,7 @@ El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con 
 
 Estos encoders poseen tres señales: una es el pulsador, y las otras dos, denominadas \texttt{CLK} y \texttt{DT}, generan una onda cuadrada desfasada 90 grados cuando el encoder rota. La fase relativa entre ambas señales determina el sentido de giro del dial.
 
-En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configuradas como entradas, aplicando mecanismos de antirrebote y procesamiento de la señal en cuadratura para determinar el estado del dial.
+En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configurados como entradas, aplicando mecanismos de antirrebote y procesamiento de la señal en cuadratura para determinar el estado del dial.
 
 \begin{figure}[ht]
 	\centering
@@ -139,7 +168,7 @@ El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs d
 	\label{fig:svc-led}
 \end{figure}
 
-El servicio consiste en una tarea que periódicamente refresca el estado de los LEDs. El uso de una tarea permite  realizar animaciones, definidas a través de una FSM (\textit{Finite State Machine}, Máquina de Estados Finitos) como la de la figura \ref{fig:svc-led-fsm}.
+El servicio consiste en una tarea que periódicamente refresca el estado de los LEDs. El uso de una tarea permite  realizar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como la de la figura \ref{fig:svc-led-fsm}.
 
 \begin{figure}[ht]
 	\centering
@@ -158,7 +187,7 @@ Se definieron tres animaciones:
 \newpage
 
 \subsection{Diseño del servicio de almacenamiento}
-La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y escribir la configuración del sistema, modelada mediante la estructura \texttt{app::Settings}. En la figura \ref{fig:svc-storage} se ilustra un diagrama en bloques del servicio.
+La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y escribir la configuración del sistema, modelada mediante la estructura \texttt{app::Settings} mencionada en la sección \ref{diagrama-bloques-sistema}. En la figura \ref{fig:svc-storage} se ilustra un diagrama en bloques del servicio.
 
 \begin{figure}[ht]
 	\centering
@@ -194,14 +223,13 @@ El proceso de transmisión involucra menos pasos, tal como puede observarse en l
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-out-pipe.png}
-	\caption{Flujo de datos para la recepción de mensajes MIDI.}
+	\caption{Flujo de datos para la transmisión de mensajes MIDI.}
 	\label{fig:svc-out-pipe}
 \end{figure}
 
-Una vez que serializado el mensaje, se copia su contenido en el buffer circular de la UART para su posterior transmisión, dando por finalizado el proceso.
+Una vez que el mensaje fue serializado, se copia su contenido en el buffer circular de la UART para su posterior transmisión, dando por finalizado el proceso.
 
-
-
+\subsection{Diseño del servicio de comunicación}
 
 %----------------------------------------------------------------------------------------
 

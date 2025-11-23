@@ -186,7 +186,7 @@ Se optó por utilizar el lenguaje C++20 \cite{ISO:14882-2020} para el desarrollo
 
 \subsection{Biblioteca HAL}
 
-Para simplificar el acceso a los periféricos del microcontrolador se empleó la biblioteca HAL (\textit{Hardware Abstraction Layer}, Capa de Abstracción de Hardware) provista por STMicroelectronics \cite{st:um1725}. Esta biblioteca ofrece una capa de abstracción sobre el hardware del STM32F413 a través de una interfaz de programación en C que encapsula el manejo directo de registros y agrupa la funcionalidad de cada periférico en módulos coherentes (por ejemplo, GPIO, UART, SPI, temporizadores y DMA).
+Para simplificar el acceso a los periféricos del microcontrolador se empleó la biblioteca HAL (\textit{Hardware Abstraction Layer}) provista por STMicroelectronics \cite{st:um1725}. Esta biblioteca ofrece una capa de abstracción sobre el hardware del STM32F413 a través de una interfaz de programación en C que encapsula el manejo directo de registros y agrupa la funcionalidad de cada periférico en módulos coherentes (por ejemplo, GPIO, UART, SPI, temporizadores y DMA).
 
 El uso de la HAL permite reducir el tiempo de desarrollo y mejorar la portabilidad del código entre distintos microcontroladores de la misma familia, ya que mantiene una interfaz de alto nivel relativamente uniforme. En este proyecto se utilizó la HAL para la inicialización del reloj del sistema, la configuración de las interfaces de comunicación digital y la gestión de interrupciones asociadas, manteniendo el código de aplicación desacoplado de los detalles específicos del dispositivo.
 
@@ -208,7 +208,7 @@ Como sistema operativo en tiempo real se utilizó FreeRTOS, un kernel ampliament
 
 Para el desarrollo de la aplicación de escritorio se empleó Qt 6 como framework principal. Qt provee un conjunto de bibliotecas en C++ orientadas al desarrollo de interfaces gráficas y aplicaciones multiplataforma, lo que facilita la ejecución de un mismo código en distintos sistemas operativos de escritorio sin cambios significativos.
 
-La interfaz de usuario se implementó mediante QML (Qt Modeling Language), un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, simplificando el mantenimiento y la evolución futura de la aplicación.
+La interfaz de usuario se implementó mediante QML (\textit{Qt Modeling Language}), un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, simplificando el mantenimiento y la evolución futura de la aplicación.
 
 %----------------------------------------------------------------------------------------
 
