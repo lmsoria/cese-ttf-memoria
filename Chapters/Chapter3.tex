@@ -56,20 +56,20 @@ El firmware se encarga de realizar íntegramente el procesamiento del flujo de d
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.75\textwidth]{./Figures/app-settings.png}
+	\includegraphics[width=\textwidth]{./Figures/app-settings.png}
 	\caption{Diagrama en clases de las estructuras de datos principales de la aplicación.}
 	\label{fig:app-settings}
 \end{figure}
 
 Recorriendo el diagrama de menor a mayor jerarquía, se encuentran las siguientes estructuras:
 \begin{itemize}
-	\item \texttt{Version}: Se utiliza para versionar la imagen de firmware.
-	\item \texttt{SystemFilters}: Representa mediante un \texttt{std::bitset} \cite{cppreference:bitset} de 11 bits si los mensajes de sistema deben ser filtrados o no (un bit por cada tipo de mensaje).
-	\item \texttt{ChannelFilters}: Cumple la misma funcionalidad que \texttt{SystemFilters}, con la salvedad de que, como los mensajes de canal tienen un canal asociado, esta estructura es un arreglo de dieciséis \texttt{std::bitset} de 7 bits.
-	\item \texttt{RouterSettings}: El ruteo entre entradas y salidas también se modela con un \texttt{std::bitset}. Dado que el sistema posee 4 entradas y 8 salidas, esta estructura es un arreglo de cuatro \texttt{std::bitset} de 8 bits.
-	\item \texttt{IOSettings}: Esta estructura encapsula todas las propiedades que se pueden modificar en las entradas y salidas: un nombre, la configuración de filtros y si se encuentra habilitada o no.
-	\item \texttt{Preset}: Contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además se le agrega un nombre para que el usuario también pueda identificarla.
-	\item \texttt{Settings}: Contiene el estado de los dieciséis preset, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
+	\item \texttt{Version}: se utiliza para versionar la imagen de firmware.
+	\item \texttt{SystemFilters}: representa mediante un \texttt{std::bitset} \cite{cppreference:bitset} de 11 bits si los mensajes de sistema deben ser filtrados o no (un bit por cada tipo de mensaje).
+	\item \texttt{ChannelFilters}: cumple la misma funcionalidad que \texttt{SystemFilters}, con la salvedad de que, como los mensajes de canal tienen un canal asociado, esta estructura es un arreglo de dieciséis \texttt{std::bitset} de 7 bits.
+	\item \texttt{RouterSettings}: el ruteo entre entradas y salidas también se modela con un \texttt{std::bitset}. Dado que el sistema posee 4 entradas y 8 salidas, esta estructura es un arreglo de cuatro \texttt{std::bitset} de 8 bits.
+	\item \texttt{IOSettings}: esta estructura encapsula todas las propiedades que se pueden modificar en las entradas y salidas: un nombre, la configuración de filtros y si se encuentra habilitada o no.
+	\item \texttt{Preset}: contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además se le agrega un nombre para que el usuario también pueda identificarla.
+	\item \texttt{Settings}: contiene el estado de los dieciséis preset, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
 \end{itemize}
 %----------------------------------------------------------------------------------------
 
@@ -89,18 +89,16 @@ Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capa
 	\label{fig:fw-layers}
 \end{figure}
 
-A continuación se detalla la funcionalidad de cada una de ellas:
+A continuación, se detalla la funcionalidad de cada una de ellas:
 \begin{itemize}
-	\item \texttt{Hardware}: No es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
-	\item \texttt{ST HAL}: Es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se contempla tambien la biblioteca USB desarrollada por ST.
-	\item \texttt{freeRTOS}: Es la biblioteca de freeRTOS, también desarrollada por terceros \cite{freertos:rtos-book}.
-	\item \texttt{os}: Es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
-	\item \texttt{hal}: Es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
-	\item \texttt{svc}: Capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, más relacionadas con los requerimientos de la aplicación.
-	\item \texttt{app}: Capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
+	\item \texttt{Hardware}: no es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
+	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se contempla tambien la biblioteca USB desarrollada por ST.
+	\item \texttt{freeRTOS}: es la biblioteca de freeRTOS, también desarrollada por terceros \cite{freertos:rtos-book}.
+	\item \texttt{os}: es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
+	\item \texttt{hal}: es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
+	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, más relacionadas con los requerimientos de la aplicación.
+	\item \texttt{app}: capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
 \end{itemize}
-
-\newpage
 
 En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
 
@@ -113,19 +111,17 @@ En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa
 
 La aplicación consiste en cinco tipos de servicios o sistemas interactuando entre sí:
 \begin{enumerate}
-	\item \texttt{svc::dial}: Es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
-	\item \texttt{svc::led}: Controla los LEDs del panel frontal, con la intención principal de indicar el número de preset activo.
-	\item \texttt{svc::storage}: Se encarga de leer y escribir la configuración de la aplicación en la memoria interna del microcontrolador.
-	\item \texttt{svc::comms}: Gestiona la comunicación con la computadora. Es la encargada de serializar y deserializar los comandos establecidos por el protocolo diseñado para la comunicación entre el firmware y el software.
-	\item \texttt{svc::io}: Es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes
+	\item \texttt{svc::dial}: es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
+	\item \texttt{svc::led}: controla los LEDs del panel frontal, con la intención principal de indicar el número de preset activo.
+	\item \texttt{svc::storage}: se encarga de leer y escribir la configuración de la aplicación en la memoria interna del microcontrolador.
+	\item \texttt{svc::comms}: gestiona la comunicación con la computadora. Es la encargada de serializar y deserializar los comandos establecidos por el protocolo diseñado para la comunicación entre el firmware y el software.
+	\item \texttt{svc::io}: es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes
 \end{enumerate}
 
 Cada uno de estos servicios tiene una serie de dependencias que necesita para operar correctamente. La aplicación es la encargada de instanciarlas e inyectarlas.
 Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el patrón de Objeto Activo \cite{lavender-schmidt:active-object}, en donde una tarea monitorea el estado de una cola de eventos que son procesados de manera diferida. Estos eventos son estructuras de datos generadas asincrónicamente por los servicios, y pueden contener o no información asociada.
 
-\newpage
-
-\subsection{Diseño del servicio de Dial}
+\subsection{Diseño del servicio de dial}
 El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador. En la figura \ref{fig:rotary-encoder} se muestra una fotografía de un encoder típico, montado en una placa tipo breakout para prototipos.
 
 \begin{figure}[ht]
@@ -144,17 +140,17 @@ En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-dial.png}
-	\caption{Diagrama en bloques del servicio de Dial.}
+	\caption{Diagrama en bloques del servicio de dial.}
 	\label{fig:svc-dial}
 \end{figure}
 
 Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos son enviados a la aplicación principal:
 \begin{itemize}
-	\item \texttt{ButtonPressed}: El botón ha sido apretado una sola vez.
-	\item \texttt{ButtonDoublePressed}: El botón ha sido apretado dos veces en una ventana de tiempo corta (configurable a través de una constante de compilación).
-	\item \texttt{ButtonLongPressed}: El botón ha sido apretado y retenido por un intervalo de tiempo largo (configurable a través de una constante de compilación).
-	\item \texttt{DialCW}: El encoder ha rotado en sentido horario.
-	\item \texttt{DialCCW}: El encoder ha rotado en sentido antihorario.
+	\item \texttt{ButtonPressed}: el botón ha sido apretado una sola vez.
+	\item \texttt{ButtonDoublePressed}: el botón ha sido apretado dos veces en una ventana de tiempo corta (configurable a través de una constante de compilación).
+	\item \texttt{ButtonLongPressed}: el botón ha sido apretado y retenido por un intervalo de tiempo largo (configurable a través de una constante de compilación).
+	\item \texttt{DialCW}: el encoder ha rotado en sentido horario.
+	\item \texttt{DialCCW}: el encoder ha rotado en sentido antihorario.
 \end{itemize}
 
 
@@ -179,9 +175,9 @@ El servicio consiste en una tarea que periódicamente refresca el estado de los 
 
 Se definieron tres animaciones:
 \begin{enumerate}
-	\item \texttt{Startup}: Ocurre cuando el sistema inicializa. Hace un barrido por todos los LEDs, comenzando y terminando por el LED correspondiente al preset activo. Cuando finaliza la animación se transiciona al estado \texttt{Steady}.
-	\item \texttt{Steady}: Es el estado por defecto del sistema. Se mantiene encendido el LED correspondiente al preset activo. El servicio dispone de una función llamada \texttt{set\_active\_preset()} para poder actualizar el LED a encender.
-	\item \texttt{Blink}: Este estado se utiliza para indicarle al usuario que un preset ha sido guardado como activo, invocando el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
+	\item \texttt{Startup}: ocurre cuando el sistema inicializa. Hace un barrido por todos los LEDs, comenzando y terminando por el LED correspondiente al preset activo. Cuando finaliza la animación se transiciona al estado \texttt{Steady}.
+	\item \texttt{Steady}: es el estado por defecto del sistema. Se mantiene encendido el LED correspondiente al preset activo. El servicio dispone de una función llamada \texttt{set\_active\_preset()} para poder actualizar el LED a encender.
+	\item \texttt{Blink}: este estado se utiliza para indicarle al usuario que un preset ha sido guardado como activo, invocando el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
 \end{enumerate}
 
 \newpage
@@ -197,7 +193,7 @@ La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y e
 \end{figure}
 
 \subsection{Diseño del servicio de I/O}
-El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encargado de procesar el flujo de mensajes MIDI desde las entradas hasta las salidas. En la figura \ref{fig:svc-io} se observa un diagrama en bloques del mismo.
+El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encargado de procesar el flujo de mensajes MIDI desde las entradas hasta las salidas. En la figura \ref{fig:svc-io} se observa un diagrama en bloques del servicio.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-io.png}
