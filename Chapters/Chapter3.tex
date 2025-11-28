@@ -226,6 +226,27 @@ El proceso de transmisión involucra menos pasos, tal como puede observarse en l
 Una vez que el mensaje fue serializado, se copia su contenido en el buffer circular de la UART para su posterior transmisión, dando por finalizado el proceso.
 
 \subsection{Diseño del servicio de comunicación}
+El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación con la aplicación de escritorio mediante la emulación de un puerto serie virtual por USB. En la figura \ref{fig:svc-comms} se observa un diagrama en bloques del servicio.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/svc-comms.png}
+	\caption{Diagrama en bloques del servicio de comunicación.}
+	\label{fig:svc-comms}
+\end{figure}
+
+A grandes rasgos el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{./Figures/proto-command.png}
+	\caption{Estructuras utilizadas en el protocolo de comandos.}
+	\label{fig:proto-command}
+\end{figure}
+
+Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste de un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agrego un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad a futuro, se agrego un campo que representa la versión del protocolo.
+
+El contenido de cada mensaje es a su vez una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para hacer el procesamiento y generar la respuesta a enviar.
 
 %----------------------------------------------------------------------------------------
 
@@ -233,6 +254,75 @@ Una vez que el mensaje fue serializado, se copia su contenido en el buffer circu
 
 \section{Desarrollo del software} % 1 página
 
+En esta sección se describe el desarrollo de la aplicación de escritorio, desarrollada con el framework Qt6.
+
+\subsection{Arquitectura de la aplicación}
+
+La aplicación consiste en un único hilo que instancia todas las clases necesarias para la operación por parte del usuario. En la figura \ref{fig:sw-arch} se ilustra un diagrama con los bloques principales.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.9\textwidth]{./Figures/sw-arch.png}
+	\caption{Diagrama en bloques de la aplicación.}
+	\label{fig:sw-arch}
+\end{figure}
+
+Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas por los consumidores deben heredar de primitivas expuestas por la API (\textit{Application Public Interface}), siendo la más fundamental de ellas \texttt{QObject} \cite{qt:qobject}. Esta clase da acceso a mecanismos de comunicación entre clases mediante señales, incorporación de metadatos y organización del ciclo de vida mediante árboles de jerarquía, entre otras características \cite{qt:object-model}.
+
+Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliotecas que ofrece. Para este trabajo se utilizaron tres:
+\begin{enumerate}
+	\item \texttt{Qt6::Core}: Es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la cual se construyen las demás funcionalidades \cite{qt:core}.
+	
+	\item \texttt{Qt6::SerialPort}: Es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
+	
+	\item \texttt{Qt6::Quick}: Es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos y aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
+\end{enumerate}
+
+Además, se reutilizó la biblioteca \texttt{protocol} utilizada en el firmware para tener acceso a los tipos de datos que representan los comandos, así como los mecanismos de serialización y deserialización.
+
+La aplicación consiste en tres grandes módulos, cada uno con responsabilidades definidas:
+\begin{enumerate}
+	\item Un gestor del puerto serie, llamado \texttt{SerialPortManager}.
+	\item Un gestor de protocolo, llamado \texttt{ProtocolManager}.
+	\item La interfaz de usuario, desarrollada en QML.
+\end{enumerate}
+
+Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}). De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
+
+\pagebreak
+
+\subsection{Diseño del gestor del puerto serie}
+Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, siendo \texttt{QSerialPort} la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes. 
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.4\textwidth]{./Figures/serial-port-manager.png}
+	\caption{Diagrama de la clase \texttt{SerialPortManager}.}
+	\label{fig:serial-port-manager}
+\end{figure}
+
+\subsection{Diseño del gestor de protocolo}
+El gestor de protocolo actúa como un puente entre \texttt{SerialPortManager} y la interfaz gráfica. Es el encargado de decodificar los bytes recibidos, convertirlos en comandos y modificar una variable de tipo \texttt{app::Settings}, de forma tal que refleje constantemente el estado del firmware. En la figura \ref{fig:protocol-manager} se observa un diagrama de la clase \texttt{ProtocolManager}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/protocol-manager.png}
+	\caption{Diagrama de la clase \texttt{ProtocolManager}.}
+	\label{fig:protocol-manager}
+\end{figure}
+
+De manera equivalente, la interacción del usuario en los elementos de la interfaz gráfica dispara señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones se traducen en comandos que son serializados y enviados a través de \texttt{SerialPortManager}. 
+
+\subsection{Diseño de la interfaz gráfica}
+Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece un módulo llamado \texttt{QtQuick Controls} que permite utilizar componentes estándar como botones, entradas de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes ofrecen un tema visual definido por el sistema operativo. Sin embargo, la documentación detalla cómo se pueden personalizar para ofrecer un aspecto más acorde a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/ui.png}
+	\caption{Captura de pantalla de la aplicación diseñada.}
+	\label{fig:ui}
+\end{figure}
+
+La aplicación consiste en tres sectores: en la parte superior se encuentra un widget cuya función es conectarse con el router, a la izquierda se muestra una lista que permite elegir el preset activo, y en el área central se muestra el estado del preset, usando matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes.
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
