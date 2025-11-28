@@ -271,11 +271,11 @@ Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas p
 
 Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliotecas que ofrece. Para este trabajo se utilizaron tres:
 \begin{enumerate}
-	\item \texttt{Qt6::Core}: Es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la cual se construyen las demás funcionalidades \cite{qt:core}.
+	\item \texttt{Qt6::Core}: es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la cual se construyen las demás funcionalidades \cite{qt:core}.
 	
-	\item \texttt{Qt6::SerialPort}: Es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
+	\item \texttt{Qt6::SerialPort}: es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
 	
-	\item \texttt{Qt6::Quick}: Es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos y aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
+	\item \texttt{Qt6::Quick}: es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos y aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
 \end{enumerate}
 
 Además, se reutilizó la biblioteca \texttt{protocol} utilizada en el firmware para tener acceso a los tipos de datos que representan los comandos, así como los mecanismos de serialización y deserialización.
@@ -287,7 +287,7 @@ La aplicación consiste en tres grandes módulos, cada uno con responsabilidades
 	\item La interfaz de usuario, desarrollada en QML.
 \end{enumerate}
 
-Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}). De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
+Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
 
 \pagebreak
 
