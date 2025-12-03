@@ -272,9 +272,9 @@ Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas p
 Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliotecas que ofrece. Para este trabajo se utilizaron tres:
 \begin{enumerate}
 	\item \texttt{Qt6::Core}: es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la cual se construyen las demás funcionalidades \cite{qt:core}.
-	
+
 	\item \texttt{Qt6::SerialPort}: es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
-	
+
 	\item \texttt{Qt6::Quick}: es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos y aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
 \end{enumerate}
 
@@ -292,7 +292,7 @@ Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firm
 \pagebreak
 
 \subsection{Diseño del gestor del puerto serie}
-Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, siendo \texttt{QSerialPort} la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes. 
+Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, siendo \texttt{QSerialPort} la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
 
 \begin{figure}[ht]
 	\centering
@@ -310,7 +310,7 @@ El gestor de protocolo actúa como un puente entre \texttt{SerialPortManager} y 
 	\label{fig:protocol-manager}
 \end{figure}
 
-De manera equivalente, la interacción del usuario en los elementos de la interfaz gráfica dispara señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones se traducen en comandos que son serializados y enviados a través de \texttt{SerialPortManager}. 
+De manera equivalente, la interacción del usuario en los elementos de la interfaz gráfica dispara señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones se traducen en comandos que son serializados y enviados a través de \texttt{SerialPortManager}.
 
 \subsection{Diseño de la interfaz gráfica}
 Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece un módulo llamado \texttt{QtQuick Controls} que permite utilizar componentes estándar como botones, entradas de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes ofrecen un tema visual definido por el sistema operativo. Sin embargo, la documentación detalla cómo se pueden personalizar para ofrecer un aspecto más acorde a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
@@ -323,11 +323,161 @@ Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarat
 \end{figure}
 
 La aplicación consiste en tres sectores: en la parte superior se encuentra un widget cuya función es conectarse con el router, a la izquierda se muestra una lista que permite elegir el preset activo, y en el área central se muestra el estado del preset, usando matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes.
+
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 
 \section{Desarrollo del hardware} % 1 página
+
+En esta sección se describe el proceso de diseño de los circuitos electrónicos que componen al router, así como el gabinete que contiene las placas ensambladas.
+
+\subsection{Especificaciones eléctricas de MIDI}
+Eléctricamente hablando, MIDI transmite la información serie sobre un lazo de corriente de 5 mA formado entre el transmisor y el receptor. En la figura \ref{fig:midi-standard-hw} se observa el esquemático original propuesto por la MMA en \cite{mma:midi_spec}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/midi-standard-hw.png}
+	\caption{Esquemático de los circuitos de recepción y transmisión MIDI\protect\footnotemark.}
+	\label{fig:midi-standard-hw}
+\end{figure}
+
+\footnotetext{Imagen extraída de \cite{mma:midi_spec}.}
+
+Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentación; las resistencias $R_a$, $R_b$ y $R_c$ y la etapa adaptadora de impedancia (representada con dos inversores lógicos en cascada). Por el contrario, un 1 lógico abre el lazo, por lo que no circula corriente entre el transmisor y el receptor. Dado que el estado de reposo de la UART es con su salida en alto, en un lazo MIDI no circulará corriente hasta que transmitan datos.
+
+Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde a la tecnología de la epoca basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
+
+En 2014, la MMA actualizó la especificación con el documento CA-033 \cite{mma:ca033}, en donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y además tenga más robustez en términos de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placa de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
+
+\subsection{Diseño de la placa de entradas}
+\label{hw-entradas}
+Para diseñar la etapa de entrada, se tomó como referencia el circuito propuesto por la MMA en \cite{mma:ca033}. La topología es similar al circuito de la figura \ref{fig:midi-standard-hw}, con el agregado de componentes pasivos (ferritas y capacitores) para bloquear emisiones electromagnéticas indeseadas. En base a este circuito se diseño un bloque funcional como el de la figura \ref{fig:circuit-input-stage}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/circuit-input-stage.png}
+	\caption{Circuito de entrada MIDI.}
+	\label{fig:circuit-input-stage}
+\end{figure}
+
+Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa popular que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Esto implica que es posible alimentarlo con 3,3 V (tensión con el que opera el microcontrolador).
+
+Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 K$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas (2,0 mm por 1,25 mm) permiten una fácil operación de soldadura manual.
+
+En base a este circuito se diseño la placa de entradas mostrada en la figura \ref{fig:mrc-inputs-board}, donde se pueden observar las cuatro entradas que replican el esquemático de la figura \ref{fig:circuit-input-stage}.
+
+\begin{figure}[!htpb]
+	\centering
+	\begin{subfigure}{0.75\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-inputs-board-top}
+		\caption{Vista superior.}
+		\label{fig:mrc-inputs-board-top}
+	\end{subfigure}
+
+	\vspace{0.5em}
+
+	\begin{subfigure}{0.75\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-inputs-board-bottom}
+		\caption{Vista inferior.}
+		\label{fig:mrc-inputs-board-bottom}
+	\end{subfigure}
+
+	\caption{Placa de entradas MIDI.}
+	\label{fig:mrc-inputs-board}
+\end{figure}
+
+\subsection{Diseño de la placa de salidas}
+\label{hw-salidas}
+De manera análoga a la placa de entradas, la placa de salida fue diseñada siguiendo los lineamientos de \cite{mma:ca033}. Se optó por dejar la etapa de buffers en la placa principal, para que se encuentre más cercana al microcontrolador. Por lo tanto, la placa de salidas solamente posee los conectores y los componentes pasivos para compatibilidad EMI/EMC. En la figura \ref{fig:circuit-output-stage} se observa el bloque funcional de una salida, que luego fue replicado ocho veces.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/circuit-output-stage.png}
+	\caption{Circuito de salida MIDI.}
+	\label{fig:circuit-output-stage}
+\end{figure}
+
+En la figura \ref{fig:mrc-outputs-board} se muestran las vistas superior e inferior de la placa de salida diseñada.
+
+\begin{figure}[!htpb]
+	\centering
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-outputs-board-top}
+		\caption{Vista superior.}
+		\label{fig:mrc-outputs-board-top}
+	\end{subfigure}
+
+	\vspace{0.5em}
+
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-outputs-board-bottom}
+		\caption{Vista inferior.}
+		\label{fig:mrc-outputs-board-bottom}
+	\end{subfigure}
+
+	\caption{Placa de salidas MIDI.}
+	\label{fig:mrc-outputs-board}
+\end{figure}
+
+\subsection{Diseño de la placa de usuario}
+La placa de usuario consiste en un soporte de los dieciséis diodos LED y el encoder rotativo que irán montados en el panel frontal. El manejo de cada LED es mediante GPIOs individuales, por lo que serán necesarios dieciséis puertos para la indicación visual, más tres puertos para el monitoreo del encoder. En la figura \ref{fig:circuit-user} se muestra el circuito de la placa de usuario.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{./Figures/circuit-user.png}
+	\caption{Circuito de usuario.}
+	\label{fig:circuit-user}
+\end{figure}
+
+Para la elección del modelo de LED y el valor de las resistencias, se tuvieron en cuenta las siguientes restricciones del microcontrolador \cite{st:stm32f413-ds}, \cite{st:stm32f413-rm}:
+\begin{itemize}
+	\item Tensión de salida del GPIO: 3,3 V
+	\item Corriente máxima por GPIO: 25 mA
+	\item Corriente máxima total por puerto: 120 mA
+\end{itemize}
+
+Con estos criterios se eligió el LTW-220DS5 como LED para el panel frontal. Este modelo posee una corriente de alimentación de 5 mA y una caída de tensión entre 2,7 V y 3,15 V \cite{liteon:ltw220ds5}. Con estos parámetros se determinó el rango de valores límite de resistencias, de acuerdo a la ecuación \ref{eq:resistencias}.
+
+\begin{equation}
+	\label{eq:resistencias}
+	R_{min} = \frac{3,3 V - 3,15 V}{5 mA} = 30 \Omega, R_{max} = \frac{3,3 V - 2,7 V}{5 mA} = 120 \Omega
+\end{equation}
+
+Se adoptó el valor medio (75 $\Omega$) para las resistencias de los LEDs. Este valor cumple la condición de que la corriente media por GPIO es de 5 mA (menor a los 25 mA impuestos por el fabricante), y que si todos los LEDs se encuentran encendidos simultáneamente, el consumo total es de 80 mA, menor a los 120 mA sugeridos.
+
+En la figura \ref{fig:mrc-user-board} se observan las vistas superior e inferior de la placa de usuario.
+
+\begin{figure}[!htpb]
+	\centering
+	\begin{subfigure}{0.65\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-user-board-top}
+		\caption{Vista superior.}
+		\label{fig:mrc-user-board-top}
+	\end{subfigure}
+
+	\vspace{0.5em}
+
+	\begin{subfigure}{0.65\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-user-board-bottom}
+		\caption{Vista inferior.}
+		\label{fig:mrc-user-board-bottom}
+	\end{subfigure}
+
+	\caption{Placa de usuario.}
+	\label{fig:mrc-user-board}
+\end{figure}
+
+
+\subsection{Diseño de la placa central}
+
+\subsection{Diseño del gabinete}
 
 %----------------------------------------------------------------------------------------
 
