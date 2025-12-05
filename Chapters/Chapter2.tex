@@ -208,13 +208,13 @@ Como sistema operativo en tiempo real se utilizó FreeRTOS \cite{freertos:kernel
 
 Para el desarrollo de la aplicación de escritorio se empleó Qt 6 \cite{qt:qt6} como framework principal. Qt provee un conjunto de bibliotecas en C++ orientadas al desarrollo de interfaces gráficas y aplicaciones multiplataforma, lo que facilita la ejecución de un mismo código en distintos sistemas operativos de escritorio sin cambios significativos.
 
-La interfaz de usuario se implementó mediante QML (\textit{Qt Modeling Language}) \cite{qt:qml}, un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, simplificando el mantenimiento y la evolución futura de la aplicación.
+La interfaz de usuario se implementó mediante QML (\textit{Qt Modeling Language}) \cite{qt:qml}, un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, lo que simplifica el mantenimiento y la evolución futura de la aplicación.
 
 %----------------------------------------------------------------------------------------
 
 \section{Herramientas para el diseño del hardware}
 
-El diseño de las placas de circuito impreso (PCB) se realizó utilizando KiCad \cite{kicad:eda}, una suite de software de automatización de diseño electrónico que permite la captura esquemática y el ruteo de placas multicapa, así como la generación de los archivos de fabricación correspondientes.
+El diseño de las placas de circuito impreso (PCB) se realizó con KiCad \cite{kicad:eda}, una suite de software de automatización de diseño electrónico que permite la captura esquemática y el ruteo de placas multicapa, así como la generación de los archivos de fabricación correspondientes.
 
 Por otro lado, el diseño del gabinete se llevó a cabo con Autodesk Fusion 360 \cite{autodesk:fusion360}. Esta herramienta de modelado tridimensional permitió definir la geometría del gabinete, verificar el ajuste mecánico de las placas y conectores, y generar los archivos necesarios para la fabricación del gabinete.
 

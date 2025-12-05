@@ -2,7 +2,8 @@
 
 \label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-En este capítulo se detalla el proceso de desarrollo del equipo, incluyendo la arquitectura de la solución como sistema, el firmware embebido, la aplicación de escritorio y el hardware que constituye el router.
+En este capítulo se detalla el proceso de desarrollo del equipo. Se describen la arquitectura de la solución como sistema, el firmware embebido, la aplicación de escritorio y el hardware que constituye el router.
+
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -61,7 +62,7 @@ El firmware se encarga de realizar íntegramente el procesamiento del flujo de d
 	\label{fig:app-settings}
 \end{figure}
 
-Recorriendo el diagrama de menor a mayor jerarquía, se encuentran las siguientes estructuras:
+En el diagrama, las estructuras se organizan de menor a mayor jerarquía de la siguiente manera:
 \begin{itemize}
 	\item \texttt{Version}: se utiliza para versionar la imagen de firmware.
 	\item \texttt{SystemFilters}: representa mediante un \texttt{std::bitset} \cite{cppreference:bitset} de 11 bits si los mensajes de sistema deben ser filtrados o no (un bit por cada tipo de mensaje).
@@ -71,6 +72,7 @@ Recorriendo el diagrama de menor a mayor jerarquía, se encuentran las siguiente
 	\item \texttt{Preset}: contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además se le agrega un nombre para que el usuario también pueda identificarla.
 	\item \texttt{Settings}: contiene el estado de los dieciséis preset, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
 \end{itemize}
+
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -80,7 +82,7 @@ Recorriendo el diagrama de menor a mayor jerarquía, se encuentran las siguiente
 En esta sección se describe la arquitectura del firmware y los componentes que lo integran.
 
 \subsection{Arquitectura del firmware} \label{arquitectura-firmware}
-Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capas con diferentes niveles de abstracción. En la figura \ref{fig:fw-layers} se ilustra la segmentación realizada.
+Para desarrollar la aplicación se segmentó la funcionalidad en capas con diferentes niveles de abstracción. En la figura \ref{fig:fw-layers} se ilustra la segmentación realizada.
 
 \begin{figure}[ht]
 	\centering
@@ -92,8 +94,8 @@ Para desarrollar la aplicación, se segmentó la funcionalidad en distintas capa
 A continuación, se detalla la funcionalidad de cada una de ellas:
 \begin{itemize}
 	\item \texttt{Hardware}: no es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
-	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se contempla tambien la biblioteca USB desarrollada por ST.
-	\item \texttt{freeRTOS}: es la biblioteca de freeRTOS, también desarrollada por terceros \cite{freertos:rtos-book}.
+	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se incluye también la biblioteca USB desarrollada por ST.
+	\item \texttt{freeRTOS}: es la biblioteca de freeRTOS, desarrollada por terceros \cite{freertos:rtos-book}.
 	\item \texttt{os}: es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
 	\item \texttt{hal}: es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
 	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, más relacionadas con los requerimientos de la aplicación.
@@ -118,8 +120,8 @@ La aplicación consiste en cinco tipos de servicios o sistemas interactuando ent
 	\item \texttt{svc::io}: es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes
 \end{enumerate}
 
-Cada uno de estos servicios tiene una serie de dependencias que necesita para operar correctamente. La aplicación es la encargada de instanciarlas e inyectarlas.
-Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el patrón de Objeto Activo \cite{lavender-schmidt:active-object}, en donde una tarea monitorea el estado de una cola de eventos que son procesados de manera diferida. Estos eventos son estructuras de datos generadas asincrónicamente por los servicios, y pueden contener o no información asociada.
+Cada uno de estos servicios requiere un conjunto de dependencias para operar correctamente. La capa de aplicación es la encargada de instanciarlas e inyectarlas.
+Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el patrón de Objeto Activo \cite{lavender-schmidt:active-object}, en donde una tarea monitorea el estado de una cola de eventos que son procesados de manera diferida. Estos eventos son estructuras de datos que los servicios generan de manera asíncrona y pueden contener o no información asociada.
 
 \subsection{Diseño del servicio de dial}
 El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador. En la figura \ref{fig:rotary-encoder} se muestra una fotografía de un encoder típico, montado en una placa tipo breakout para prototipos.
@@ -135,7 +137,7 @@ El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con 
 
 Estos encoders poseen tres señales: una es el pulsador, y las otras dos, denominadas \texttt{CLK} y \texttt{DT}, generan una onda cuadrada desfasada 90 grados cuando el encoder rota. La fase relativa entre ambas señales determina el sentido de giro del dial.
 
-En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configurados como entradas, aplicando mecanismos de antirrebote y procesamiento de la señal en cuadratura para determinar el estado del dial.
+En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configurados como entradas, donde se aplican mecanismos de antirrebote y se procesa la señal en cuadratura para determinar el estado del dial.
 
 \begin{figure}[ht]
 	\centering
@@ -164,7 +166,7 @@ El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs d
 	\label{fig:svc-led}
 \end{figure}
 
-El servicio consiste en una tarea que periódicamente refresca el estado de los LEDs. El uso de una tarea permite  realizar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como la de la figura \ref{fig:svc-led-fsm}.
+El servicio consiste en una tarea que actualiza periódicamente el estado de los LEDs. El uso de una tarea permite implementar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como la de la figura \ref{fig:svc-led-fsm}.
 
 \begin{figure}[ht]
 	\centering
@@ -201,7 +203,7 @@ El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encar
 	\label{fig:svc-io}
 \end{figure}
 
-Dado que hay UARTs que operan como entrada o como entrada-salida, el servicio de I/O admite distintas especializaciones, determinadas por el parámetro \texttt{Mode}, que puede ser \texttt{Input} (solo entrada), \texttt{Output} (solo salida) o \texttt{InputOutput} (entrada y salida). Si el servicio admite entrada, se instanciará una tarea que se encarga de procesar los mensajes provenientes de la UART. Por otra parte, si el servicio admite salida, se instanciará una tarea que se encarga de procesar los mensajes recibidos y transmitirlos por la UART.
+Dado que hay UARTs que operan como entrada o como entrada-salida, el servicio de I/O admite distintas especializaciones, determinadas por el parámetro \texttt{Mode}, que puede ser \texttt{Input} (solo entrada), \texttt{Output} (solo salida) o \texttt{InputOutput} (entrada y salida). Si el servicio admite entrada, se instancia una tarea encargada de procesar los mensajes provenientes de la UART. Por otra parte, si el servicio admite salida, se instancia una tarea encargada de procesar los mensajes recibidos y transmitirlos por la UART.
 
 El flujo de entrada-salida sigue un patrón de diseño conocido como segmentación de procesos. Este permite transformar datos de una representación a otra mientras se mueven secuencialmente desde un productor a un consumidor \cite{sommerville:ingenieria-sw}. Para ilustrar este concepto, en las figuras \ref{fig:svc-in-pipe} y \ref{fig:svc-out-pipe} se representan los flujos de datos en las tareas de recepción y transmisión de mensajes, respectivamente.
 
@@ -212,8 +214,7 @@ El flujo de entrada-salida sigue un patrón de diseño conocido como segmentaci�
 	\label{fig:svc-in-pipe}
 \end{figure}
 
-La tarea de recepción involucra más pasos, ya que es necesario convertir la información binaria recibida por la UART en mensajes MIDI. Para ello, se cuenta con una clase llamada \texttt{app::Parser} encargada de convertir una secuencia de bytes en una secuencia de mensajes MIDI. Una vez detectados los tipos de mensaje recibidos, se procede a filtrarlos. La clase \texttt{app::Filter} verifica en la configuración de usuario si el mensaje se encuentra bloqueado. En caso negativo, se transmite a la siguiente etapa, donde la clase \texttt{app::Router} consulta en la configuración a qué salidas debe propagarse. Como los procesos de recepción y transmisión se gestionan en tareas diferentes, y dado que más de una tarea de entrada puede escribir en una tarea de salida, se utilizan colas de mensajes como mecanismo de sincronización para enviar los mensajes MIDI desde las entradas hacia las salidas. FreeRTOS garantiza que estas estructuras son aptas para situaciones de concurrencia \cite{freertos:queues}.
-
+La tarea de recepción incluye más etapas, ya que es necesario convertir la información binaria recibida por la UART en mensajes MIDI. Para ello, se cuenta con una clase llamada \texttt{app::Parser} encargada de convertir una secuencia de bytes en una secuencia de mensajes MIDI. Una vez detectados los tipos de mensaje recibidos, se procede a filtrarlos. La clase \texttt{app::Filter} verifica en la configuración de usuario si el mensaje se encuentra bloqueado. En caso negativo, se transmite a la siguiente etapa, donde la clase \texttt{app::Router} consulta en la configuración a qué salidas debe propagarse. Los procesos de recepción y transmisión se gestionan en tareas diferentes. Dado que más de una tarea de entrada puede escribir sobre una misma tarea de salida, se utilizan colas de mensajes como mecanismo de sincronización para enviar los mensajes MIDI desde las entradas hacia las salidas. FreeRTOS garantiza que estas estructuras son aptas para situaciones de concurrencia \cite{freertos:queues}.
 
 El proceso de transmisión involucra menos pasos, tal como puede observarse en la figura \ref{fig:svc-out-pipe}. La tarea permanece bloqueada hasta que aparezcan mensajes en la cola. Ante la presencia de ellos se procede a consultar la configuración del filtro de la salida. Si el mensaje no debe ser bloqueado, se procede a transmitirlo por el puerto serie. Para ello es necesario serializar primero el mensaje, responsabilidad de la clase \texttt{app::Serializer}.
 \begin{figure}[ht]
@@ -235,7 +236,7 @@ El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación co
 	\label{fig:svc-comms}
 \end{figure}
 
-A grandes rasgos el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
+A grandes rasgos, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
 
 \begin{figure}[ht]
 	\centering
@@ -244,9 +245,77 @@ A grandes rasgos el servicio se compone de dos tareas: una encargada de la recep
 	\label{fig:proto-command}
 \end{figure}
 
-Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste de un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agrego un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad a futuro, se agrego un campo que representa la versión del protocolo.
+Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste en un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agregó un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad futura, se agregó un campo que representa la versión del protocolo.
 
-El contenido de cada mensaje es a su vez una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para hacer el procesamiento y generar la respuesta a enviar.
+El contenido de cada mensaje es a su vez una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para hacer el procesamiento y generar la respuesta a enviar. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia representando el intercambio de mensajes entre la aplicación y el firmware.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{./Figures/proto-sequence.png}
+	\caption{Diagrama de secuencia del procesamiento de comandos del protocolo.}
+	\label{fig:proto-sequence}
+\end{figure}
+
+En caso de que haya un error en la deserialización del comando recibido, el servicio se encarga de enviar un pedido de retransmisión (\texttt{Retx}) como respuesta. Este flujo se observa en la figura \ref{fig:proto-invalid}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.7\textwidth]{./Figures/proto-invalid.png}
+	\caption{Diagrama de secuencia del procesamiento de una trama inválida.}
+	\label{fig:proto-invalid}
+\end{figure}
+
+Con esta premisa se sientan las bases del protocolo de comunicación. En la tabla \ref{tab:proto-commands} se listan todos los comandos desarrollados junto a una descripción de su función, mientras que en la tabla \ref{tab:proto-responses} se indican las respuestas enviadas por el router.
+
+\begin{table}[ht]
+    \centering
+    \caption[Comandos del protocolo.]{Comandos del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada comando. }
+    \label{tab:proto-commands}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{ll}
+            \toprule
+            \textbf{Comando}                    & \textbf{Descripción}                                                                                                                                                                           \\
+            \midrule
+            \texttt{GetSettings}                & Obtener la configuración del equipo.                                                                                                                                                            \\
+            \texttt{SetActivePreset}            & Setear el preset \texttt{preset\_number} como activo.                                                                                                                                           \\
+            \texttt{SetPresetName}              & Asignar \texttt{name} al preset \texttt{preset\_number}.                                                                                               \\
+            \texttt{SetIOName}                  & Asignar \texttt{name} a la \texttt{io} \texttt{io\_number}, en el preset  \texttt{preset\_number}.                                                                                               \\
+            \texttt{EnableIO}                   & Habilitar la io \texttt{io\_number}, en el preset \texttt{preset\_number}.                                                                                                                       \\
+            \texttt{RouteIO}                    & \begin{tabular}[c]{@{}l@{}}Rutear la entrada \texttt{input\_number} con la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular} \\
+            \texttt{RouteAllInputsTo}           & \begin{tabular}[c]{@{}l@{}}Rutear todas las entradas a la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                   \\
+            \texttt{RouteAllOutputsTo}          & \begin{tabular}[c]{@{}l@{}}Rutear todas las salidas a la entrada \texttt{input\_number} \\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                     \\
+            \texttt{ResetRoutingFor}            & Resetear la configuración de ruteo para el preset \texttt{preset\_number}.                                                                                                                      \\
+            \texttt{EnableChannelFilter}        & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{channel\_filter} en el canal \texttt{channel\_number} en la \texttt{io}\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular} \\
+            \texttt{EnableAllChannelsForFilter} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los canales para el filtro \texttt{channel\_filter} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
+            \texttt{EnableAllFiltersForChannel} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros para el canal \texttt{channel\_number} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
+            \texttt{EnableSystemFilter}         & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{system\_filter} en la \texttt{io} \texttt{io\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                                      \\
+            \texttt{EnableAllSystemFiltersFor}  & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros de sistema en la \texttt{io} \texttt{io\_number} \\ de acuerdo con \texttt{enabled}, en el  preset \texttt{preset\_number}.\end{tabular}                                      \\
+            \texttt{StoreSettings}              & Guardar el estado actual del sistema en memoria.\\
+            \bottomrule
+			\hline
+        \end{tabular}%
+    }
+\end{table}
+
+\begin{table}[ht]
+	\centering
+	\caption[Respuestas del protocolo.]{Respuestas del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada respuesta.}
+	\label{tab:proto-responses}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{ll}
+			\toprule
+			\textbf{Respuesta}                    & \textbf{Descripción}                                                                   \\
+			\midrule
+			\texttt{Ack}                          & Comando procesado correctamente.                                                       \\
+			\texttt{Nack}                         & Comando recibido, pero no puede ser procesado al momento de la petición.               \\
+			\texttt{Retx}                         & Error en la recepción, se solicita retransmitir el comando.                            \\
+			\texttt{StartSystemStateTransmission}  & \begin{tabular}[c]{@{}l@{}}Se enviará el estado del equipo en \texttt{number\_of\_packets} paquetes \\ de tamaño \texttt{chunk\_size}.\end{tabular} \\
+			\texttt{SystemStateChumk}             & Envío del paquete \texttt{packet\_number} con un buffer \texttt{data}. \\
+		\bottomrule
+		\hline
+		\end{tabular}%
+	}
+\end{table}
 
 %----------------------------------------------------------------------------------------
 
@@ -258,16 +327,16 @@ En esta sección se describe el desarrollo de la aplicación de escritorio, desa
 
 \subsection{Arquitectura de la aplicación}
 
-La aplicación consiste en un único hilo que instancia todas las clases necesarias para la operación por parte del usuario. En la figura \ref{fig:sw-arch} se ilustra un diagrama con los bloques principales.
+La aplicación se implementa como un único hilo de ejecución que instancia todas las clases necesarias para la operación por parte del usuario. En la figura \ref{fig:sw-arch} se ilustra un diagrama con los bloques principales.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{./Figures/sw-arch.png}
+	\includegraphics[width=0.6\textwidth]{./Figures/sw-arch.png}
 	\caption{Diagrama en bloques de la aplicación.}
 	\label{fig:sw-arch}
 \end{figure}
 
-Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas por los consumidores deben heredar de primitivas expuestas por la API (\textit{Application Public Interface}), siendo la más fundamental de ellas \texttt{QObject} \cite{qt:qobject}. Esta clase da acceso a mecanismos de comunicación entre clases mediante señales, incorporación de metadatos y organización del ciclo de vida mediante árboles de jerarquía, entre otras características \cite{qt:object-model}.
+Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas por los consumidores deben heredar de primitivas expuestas por la API (\textit{Application Public Interface}). Entre dichas primitivas, la más fundamental es \texttt{QObject} \cite{qt:qobject}. Esta clase da acceso a mecanismos de comunicación entre clases mediante señales, incorporación de metadatos y organización del ciclo de vida mediante árboles de jerarquía, entre otras características \cite{qt:object-model}.
 
 Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliotecas que ofrece. Para este trabajo se utilizaron tres:
 \begin{enumerate}
@@ -289,20 +358,27 @@ La aplicación consiste en tres grandes módulos, cada uno con responsabilidades
 
 Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
 
-\pagebreak
-
 \subsection{Diseño del gestor del puerto serie}
-Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, siendo \texttt{QSerialPort} la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
+Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, donde \texttt{QSerialPort} es la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.4\textwidth]{./Figures/serial-port-manager.png}
+	\includegraphics[width=0.5\textwidth]{./Figures/serial-port-manager.png}
 	\caption{Diagrama de la clase \texttt{SerialPortManager}.}
 	\label{fig:serial-port-manager}
 \end{figure}
 
+La responsabilidad de esta clase contempla:
+\begin{itemize}
+	\item Listar los puertos disponibles (\texttt{availablePorts()}).
+	\item Abrir y cerrar el puerto deseado por el consumidor de la clase (\texttt{open()}, \texttt{close()}).
+	\item Escribir una secuencia de bytes (\texttt{write()}).
+	\item Notificar a través de una señal que hay bytes disponibles para leer (\texttt{read()}).
+\end{itemize}
+
 \subsection{Diseño del gestor de protocolo}
-El gestor de protocolo actúa como un puente entre \texttt{SerialPortManager} y la interfaz gráfica. Es el encargado de decodificar los bytes recibidos, convertirlos en comandos y modificar una variable de tipo \texttt{app::Settings}, de forma tal que refleje constantemente el estado del firmware. En la figura \ref{fig:protocol-manager} se observa un diagrama de la clase \texttt{ProtocolManager}.
+El gestor de protocolo cumple la función de puente entre \texttt{SerialPortManager} y la interfaz gráfica. Se encarga de decodificar los bytes recibidos, transformarlos en comandos del protocolo y actualizar una instancia de tipo \texttt{app::Settings}, de modo que ese objeto refleje el estado del firmware cada vez que el equipo transmite la configuración completa. En la figura \ref{fig:protocol-manager} se observa un diagrama de la clase \texttt{ProtocolManager}.
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/protocol-manager.png}
@@ -310,19 +386,26 @@ El gestor de protocolo actúa como un puente entre \texttt{SerialPortManager} y 
 	\label{fig:protocol-manager}
 \end{figure}
 
-De manera equivalente, la interacción del usuario en los elementos de la interfaz gráfica dispara señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones se traducen en comandos que son serializados y enviados a través de \texttt{SerialPortManager}.
+De manera recíproca, la interacción del usuario con los elementos de la interfaz gráfica produce señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones convierten las operaciones solicitadas en comandos del protocolo, los serializan y los envían a través de \texttt{SerialPortManager}. Por este motivo, la clase ofrece métodos que replican los comandos y respuestas listados en las tablas \ref{tab:proto-commands} y \ref{tab:proto-responses}, respectivamente.
+
+Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar llamada \texttt{SettingsParser} que opera como una máquina de estados: interpreta los comandos relacionados con la transmisión del estado del sistema, reconstruye la estructura \texttt{app::Settings} a partir de los fragmentos recibidos y notifica cuando se finalizó la reconstrucción.
 
 \subsection{Diseño de la interfaz gráfica}
 Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece un módulo llamado \texttt{QtQuick Controls} que permite utilizar componentes estándar como botones, entradas de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes ofrecen un tema visual definido por el sistema operativo. Sin embargo, la documentación detalla cómo se pueden personalizar para ofrecer un aspecto más acorde a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/ui.png}
 	\caption{Captura de pantalla de la aplicación diseñada.}
 	\label{fig:ui}
 \end{figure}
 
-La aplicación consiste en tres sectores: en la parte superior se encuentra un widget cuya función es conectarse con el router, a la izquierda se muestra una lista que permite elegir el preset activo, y en el área central se muestra el estado del preset, usando matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes.
+La aplicación consiste en tres sectores:
+\begin{enumerate}
+	\item Un widget que permite listar y actualizar los puertos serie disponibles y establecer la conexión con el router.
+	\item Una lista que permite elegir el preset activo.
+	\item El área central donde se muestra el estado del preset, usando matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes. En esta área también se pueden editar los nombres de las entradas, salidas y del preset.
+\end{enumerate}
 
 %----------------------------------------------------------------------------------------
 
@@ -332,8 +415,8 @@ La aplicación consiste en tres sectores: en la parte superior se encuentra un w
 
 En esta sección se describe el proceso de diseño de los circuitos electrónicos que componen al router, así como el gabinete que contiene las placas ensambladas.
 
-\subsection{Especificaciones eléctricas de MIDI}
-Eléctricamente hablando, MIDI transmite la información serie sobre un lazo de corriente de 5 mA formado entre el transmisor y el receptor. En la figura \ref{fig:midi-standard-hw} se observa el esquemático original propuesto por la MMA en \cite{mma:midi_spec}.
+\subsection{Especificación eléctrica de MIDI}
+Desde un punto de vista eléctrico, MIDI transmite la información serie sobre un lazo de corriente de 5 mA formado entre el transmisor y el receptor. En la figura \ref{fig:midi-standard-hw} se observa el esquemático original propuesto por la MMA en \cite{mma:midi_spec}.
 
 \begin{figure}[ht]
 	\centering
@@ -346,28 +429,25 @@ Eléctricamente hablando, MIDI transmite la información serie sobre un lazo de 
 
 Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentación; las resistencias $R_a$, $R_b$ y $R_c$ y la etapa adaptadora de impedancia (representada con dos inversores lógicos en cascada). Por el contrario, un 1 lógico abre el lazo, por lo que no circula corriente entre el transmisor y el receptor. Dado que el estado de reposo de la UART es con su salida en alto, en un lazo MIDI no circulará corriente hasta que transmitan datos.
 
-Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde a la tecnología de la epoca basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
+Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde con la tecnología de la época basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
 
-En 2014, la MMA actualizó la especificación con el documento CA-033 \cite{mma:ca033}, en donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y además tenga más robustez en términos de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placa de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
+En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite{mma:ca033}, donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y aumente su robustez frente a problemas de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placa de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
 
 \subsection{Diseño de la placa de entradas}
 \label{hw-entradas}
-Para diseñar la etapa de entrada, se tomó como referencia el circuito propuesto por la MMA en \cite{mma:ca033}. La topología es similar al circuito de la figura \ref{fig:midi-standard-hw}, con el agregado de componentes pasivos (ferritas y capacitores) para bloquear emisiones electromagnéticas indeseadas. En base a este circuito se diseño un bloque funcional como el de la figura \ref{fig:circuit-input-stage}.
+Para diseñar la etapa de entrada, se tomó como referencia el circuito propuesto por la MMA en \cite{mma:ca033}. La topología es similar al circuito de la figura \ref{fig:midi-standard-hw}, con el agregado de componentes pasivos (ferritas y capacitores) para bloquear emisiones electromagnéticas indeseadas. En la figura \ref{fig:circuit-input-stage} se observa el diseño implementado.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/circuit-input-stage.png}
+	\includegraphics[width=0.75\textwidth]{./Figures/circuit-input-stage.png}
 	\caption{Circuito de entrada MIDI.}
 	\label{fig:circuit-input-stage}
 \end{figure}
 
-Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa popular que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Esto implica que es posible alimentarlo con 3,3 V (tensión con el que opera el microcontrolador).
+Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 K$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas permiten una fácil soldadura manual.
 
-Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 K$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas (2,0 mm por 1,25 mm) permiten una fácil operación de soldadura manual.
-
-En base a este circuito se diseño la placa de entradas mostrada en la figura \ref{fig:mrc-inputs-board}, donde se pueden observar las cuatro entradas que replican el esquemático de la figura \ref{fig:circuit-input-stage}.
-
-\begin{figure}[!htpb]
+En base al circuito de la figura \ref{fig:circuit-input-stage} se diseñó la placa de entradas de la figura \ref{fig:mrc-inputs-board}.
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}{0.75\textwidth}
 		\centering
@@ -391,7 +471,7 @@ En base a este circuito se diseño la placa de entradas mostrada en la figura \r
 
 \subsection{Diseño de la placa de salidas}
 \label{hw-salidas}
-De manera análoga a la placa de entradas, la placa de salida fue diseñada siguiendo los lineamientos de \cite{mma:ca033}. Se optó por dejar la etapa de buffers en la placa principal, para que se encuentre más cercana al microcontrolador. Por lo tanto, la placa de salidas solamente posee los conectores y los componentes pasivos para compatibilidad EMI/EMC. En la figura \ref{fig:circuit-output-stage} se observa el bloque funcional de una salida, que luego fue replicado ocho veces.
+De manera análoga a la placa de entradas, la placa de salida fue diseñada de acuerdo a los lineamientos de \cite{mma:ca033}. Se optó por dejar la etapa de buffers en la placa principal, para que se encuentre más cercana al microcontrolador. Por lo tanto, la placa de salidas solamente posee los conectores y los componentes pasivos para compatibilidad EMI/EMC. En la figura \ref{fig:circuit-output-stage} se observa el bloque funcional de una salida, que luego fue replicado ocho veces.
 
 \begin{figure}[ht]
 	\centering
