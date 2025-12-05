@@ -53,7 +53,7 @@ El trabajo desarrollado consiste en dos grandes bloques. Por un lado se encuentr
 	\label{fig:sys-arch}
 \end{figure}
 
-El firmware se encarga de realizar íntegramente el procesamiento del flujo de datos (mensajes MIDI), mientras que el software actúa como interfaz de configuración del comportamiento del equipo. La comunicación entre ambas es mediante un puerto serie virtual, emulado por la interfaz USB del microcontrolador. A través de una serie de comandos, se modifican las propiedades de una estructura que modela el comportamiento de la aplicación (\texttt{Settings}). En la figura \ref{fig:app-settings} se muestra un diagrama de clases listando todas las estructuras que componen a este modelo.
+El firmware se encarga de realizar íntegramente el procesamiento del flujo de datos (mensajes MIDI), mientras que el software actúa como interfaz de configuración del comportamiento del equipo. La comunicación entre ambas es mediante un puerto serie virtual, emulado por la interfaz USB del microcontrolador. A través de una serie de comandos, se modifican las propiedades de una estructura que modela el comportamiento de la aplicación (\texttt{Settings}). En la figura \ref{fig:app-settings} se muestra un diagrama de clases que incluye todas las estructuras que componen este modelo.
 
 \begin{figure}[ht]
 	\centering
@@ -111,7 +111,7 @@ En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa
 	\label{fig:fw-arch}
 \end{figure}
 
-La aplicación consiste en cinco tipos de servicios o sistemas interactuando entre sí:
+La aplicación consiste en cinco tipos de servicios o sistemas que interactúan entre sí:
 \begin{enumerate}
 	\item \texttt{svc::dial}: es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
 	\item \texttt{svc::led}: controla los LEDs del panel frontal, con la intención principal de indicar el número de preset activo.
@@ -177,10 +177,11 @@ El servicio consiste en una tarea que actualiza periódicamente el estado de los
 
 Se definieron tres animaciones:
 \begin{enumerate}
-	\item \texttt{Startup}: ocurre cuando el sistema inicializa. Hace un barrido por todos los LEDs, comenzando y terminando por el LED correspondiente al preset activo. Cuando finaliza la animación se transiciona al estado \texttt{Steady}.
-	\item \texttt{Steady}: es el estado por defecto del sistema. Se mantiene encendido el LED correspondiente al preset activo. El servicio dispone de una función llamada \texttt{set\_active\_preset()} para poder actualizar el LED a encender.
-	\item \texttt{Blink}: este estado se utiliza para indicarle al usuario que un preset ha sido guardado como activo, invocando el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
+	\item \texttt{Startup}: ocurre cuando el sistema inicializa. Realiza un barrido por todos los LEDs: la secuencia comienza y finaliza en el LED correspondiente al preset activo. Cuando finaliza la animación se transiciona al estado \texttt{Steady}.
+	\item \texttt{Steady}: es el estado por defecto del sistema. Se mantiene encendido el LED correspondiente al preset activo. El servicio dispone de una función llamada \texttt{set\_active\_preset()} para poder actualizar el LED que debe encenderse.
+	\item \texttt{Blink}: este estado se utiliza para indicarle al usuario que un preset se guardó como activo. Para ello se invoca el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
 \end{enumerate}
+
 
 \newpage
 
@@ -224,7 +225,7 @@ El proceso de transmisión involucra menos pasos, tal como puede observarse en l
 	\label{fig:svc-out-pipe}
 \end{figure}
 
-Una vez que el mensaje fue serializado, se copia su contenido en el buffer circular de la UART para su posterior transmisión, dando por finalizado el proceso.
+Una vez que el mensaje se serializa, su contenido se copia en el buffer circular de la UART para su posterior transmisión. Con este paso concluye el proceso.
 
 \subsection{Diseño del servicio de comunicación}
 El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación con la aplicación de escritorio mediante la emulación de un puerto serie virtual por USB. En la figura \ref{fig:svc-comms} se observa un diagrama en bloques del servicio.
@@ -247,7 +248,7 @@ A grandes rasgos, el servicio se compone de dos tareas: una encargada de la rece
 
 Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste en un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agregó un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad futura, se agregó un campo que representa la versión del protocolo.
 
-El contenido de cada mensaje es a su vez una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para hacer el procesamiento y generar la respuesta a enviar. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia representando el intercambio de mensajes entre la aplicación y el firmware.
+El contenido de cada mensaje es, a su vez, una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para procesarlos y generar la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia que representa el intercambio de mensajes entre la aplicación y el firmware.
 
 \begin{figure}[ht]
 	\centering
@@ -404,7 +405,7 @@ La aplicación consiste en tres sectores:
 \begin{enumerate}
 	\item Un widget que permite listar y actualizar los puertos serie disponibles y establecer la conexión con el router.
 	\item Una lista que permite elegir el preset activo.
-	\item El área central donde se muestra el estado del preset, usando matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes. En esta área también se pueden editar los nombres de las entradas, salidas y del preset.
+	\item El área central donde se muestra el estado del preset y se utilizan matrices de checkboxes para configurar las opciones de ruteo y filtrado de mensajes. En esta área también se pueden editar los nombres de las entradas, salidas y del preset.
 \end{enumerate}
 
 %----------------------------------------------------------------------------------------
