@@ -558,7 +558,99 @@ En la figura \ref{fig:mrc-user-board} se observan las vistas superior e inferior
 
 \subsection{Diseño de la placa central}
 
+La placa central consiste de cinco bloques, que se ilustran en la figura \ref{fig:hw-blocks}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\textwidth]{./Figures/hw-blocks.png}
+	\caption{Diagrama en bloques de la placa central.}
+	\label{fig:hw-blocks}
+\end{figure}
+
+Para el diseño de la conexión USB y la etapa reguladora se tomó como referencia el esquemático del kit de desarrollo \cite{st:mb1137-schematic}. En la figura \ref{fig:circuit-usb} se muestra el conector USB con el SBLC6-2 como componente de protección contra descargas electrostáticas \cite{st:usblc6-2}. Por otro lado, se aseguró que la señal diferencial posea una impedancia característica de 90 $\Omega$, de acuerdo a lo especificado por el estándar USB 2.0 \cite{usb:2.0-spec}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\textwidth]{./Figures/circuit-usb.png}
+	\caption{Circuito del conector USB.}
+	\label{fig:circuit-usb}
+\end{figure}
+
+En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se modificó el circuito original del kit de desarrollo, ya que se deseaba usar un regulador con menor tensión de dropout. Se optó por utilizar el AP7361C, que ofrece 360 mV nominales de caída \cite{diodes:ap7361c}. Por otro lado, se utilizó el ST890 \cite{st:st890} como etapa de protección contra sobrecorriente (limitada a 500 mA).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/circuit-power.png}
+	\caption{Circuito de la fuente de alimentación.}
+	\label{fig:circuit-power}
+\end{figure}
+
+La conexión de las entradas MIDI y de la placa de usuario es directa con el microcontrolador, por lo que no se necesitan componentes adicionales. Por el contrario, la conexión con la placa de salidas posee un buffer cuya función es subir la tensión de las señales (de 3,3 V a 5 V) y adaptar impedancias. En la figura \ref{fig:circuit-out-connector} se muestra el circuito de esta etapa, basada en el 74HCS244 \cite{ti:sn74hcs244} como componente central.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{./Figures/circuit-out-connector.png}
+	\caption{Circuito del conector USB.}
+	\label{fig:circuit-out-connector}
+\end{figure}
+
+Además de lo mencionado explícitamente, durante la etapa de diseño se agregaron otros elementos que solo se mencionan:
+\begin{itemize}
+	\item Cristal de 10 MHz.
+	\item Capacitores de desacople.
+	\item Pulsador de reset.
+	\item La interfaz de programación del microcontrolador.
+	\item Test points para todas las señales.
+	\item Pads para exponer una UART adicional, usada con fines de debbuging.
+	\item Pads a pines no utilizados del microcontrolador, para facilitar futuras ampliaciones del hardware.
+\end{itemize}
+
+En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior de la placa central.
+
+\begin{figure}[htpb]
+	\centering
+	\begin{subfigure}{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-main-board-top.png}
+		\caption{Vista superior.}
+		\label{fig:mrc-main-board-top}
+	\end{subfigure}
+
+	\hspace{0.5em}
+
+	\begin{subfigure}{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./Figures/mrc-main-board-bottom}
+		\caption{Vista inferior.}
+		\label{fig:mrc-main-board-bottom}
+	\end{subfigure}
+
+	\caption{Placa central.}
+	\label{fig:mrc-main-board}
+\end{figure}
+
+
 \subsection{Diseño del gabinete}
+
+Las placas de circuito impreso fueron diseñadas con la intención de ser alojadas en un gabinete tipo rack de 19 pulgadas, ya que están estandarizados para equipamiento electrónico e informático. Estos gabinetes se dimensionan mediante unidades de rack (1 U equivale a 1,75 pulgadas). Se estableció como requerimiento usar un gabinete de 1 RU.
+
+Dado que son gabinetes estandarizados, se contactó con un productor, y se coordino el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. En la figura \ref{fig:render} se muestra un render con el despiece de las placas, el gabinete y el panel frontal.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{./Figures/render.png}
+	\caption{Render del gabinete diseñado.}
+	\label{fig:render}
+\end{figure}
+
+Una vez modelado el panel frontal, se procedió con exportar un archivo \texttt{.dxf} del mismo, requerido por el fabricante para realizar el mecanizado. En la figura \ref{fig:gabinete} se observa una fotografía del gabinete ya ensamblado.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{./Figures/gabinete.jpg}
+	\caption{Gabinete ensamblado.}
+	\label{fig:gabinete}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 
