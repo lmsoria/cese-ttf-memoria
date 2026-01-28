@@ -266,57 +266,7 @@ En caso de que haya un error en la deserialización del comando recibido, el ser
 	\label{fig:proto-invalid}
 \end{figure}
 
-Con esta premisa se sientan las bases del protocolo de comunicación. En la tabla \ref{tab:proto-commands} se listan todos los comandos desarrollados junto a una descripción de su función, mientras que en la tabla \ref{tab:proto-responses} se indican las respuestas enviadas por el router.
-
-\begin{table}[ht]
-    \centering
-    \caption[Comandos del protocolo.]{Comandos del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada comando. }
-    \label{tab:proto-commands}
-    \resizebox{\textwidth}{!}{%
-        \begin{tabular}{ll}
-            \toprule
-            \textbf{Comando}                    & \textbf{Descripción}                                                                                                                                                                           \\
-            \midrule
-            \texttt{GetSettings}                & Obtener la configuración del equipo.                                                                                                                                                            \\
-            \texttt{SetActivePreset}            & Setear el preset \texttt{preset\_number} como activo.                                                                                                                                           \\
-            \texttt{SetPresetName}              & Asignar \texttt{name} al preset \texttt{preset\_number}.                                                                                               \\
-            \texttt{SetIOName}                  & Asignar \texttt{name} a la \texttt{io} \texttt{io\_number}, en el preset  \texttt{preset\_number}.                                                                                               \\
-            \texttt{EnableIO}                   & Habilitar la io \texttt{io\_number}, en el preset \texttt{preset\_number}.                                                                                                                       \\
-            \texttt{RouteIO}                    & \begin{tabular}[c]{@{}l@{}}Rutear la entrada \texttt{input\_number} con la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular} \\
-            \texttt{RouteAllInputsTo}           & \begin{tabular}[c]{@{}l@{}}Rutear todas las entradas a la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                   \\
-            \texttt{RouteAllOutputsTo}          & \begin{tabular}[c]{@{}l@{}}Rutear todas las salidas a la entrada \texttt{input\_number} \\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                     \\
-            \texttt{ResetRoutingFor}            & Resetear la configuración de ruteo para el preset \texttt{preset\_number}.                                                                                                                      \\
-            \texttt{EnableChannelFilter}        & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{channel\_filter} en el canal \texttt{channel\_number} en la \texttt{io}\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular} \\
-            \texttt{EnableAllChannelsForFilter} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los canales para el filtro \texttt{channel\_filter} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
-            \texttt{EnableAllFiltersForChannel} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros para el canal \texttt{channel\_number} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
-            \texttt{EnableSystemFilter}         & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{system\_filter} en la \texttt{io} \texttt{io\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                                      \\
-            \texttt{EnableAllSystemFiltersFor}  & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros de sistema en la \texttt{io} \texttt{io\_number} \\ de acuerdo con \texttt{enabled}, en el  preset \texttt{preset\_number}.\end{tabular}                                      \\
-            \texttt{StoreSettings}              & Guardar el estado actual del sistema en memoria.\\
-            \bottomrule
-			\hline
-        \end{tabular}%
-    }
-\end{table}
-
-\begin{table}[ht]
-	\centering
-	\caption[Respuestas del protocolo.]{Respuestas del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada respuesta.}
-	\label{tab:proto-responses}
-	\resizebox{\textwidth}{!}{%
-		\begin{tabular}{ll}
-			\toprule
-			\textbf{Respuesta}                    & \textbf{Descripción}                                                                   \\
-			\midrule
-			\texttt{Ack}                          & Comando procesado correctamente.                                                       \\
-			\texttt{Nack}                         & Comando recibido, pero no puede ser procesado al momento de la petición.               \\
-			\texttt{Retx}                         & Error en la recepción, se solicita retransmitir el comando.                            \\
-			\texttt{StartSystemStateTransmission}  & \begin{tabular}[c]{@{}l@{}}Se enviará el estado del equipo en \texttt{number\_of\_packets} paquetes \\ de tamaño \texttt{chunk\_size}.\end{tabular} \\
-			\texttt{SystemStateChumk}             & Envío del paquete \texttt{packet\_number} con un buffer \texttt{data}. \\
-		\bottomrule
-		\hline
-		\end{tabular}%
-	}
-\end{table}
+Con esta premisa se sientan las bases del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
 
 %----------------------------------------------------------------------------------------
 
@@ -360,11 +310,11 @@ La aplicación consiste en tres grandes módulos, cada uno con responsabilidades
 Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
 
 \subsection{Diseño del gestor del puerto serie}
-Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, donde \texttt{QSerialPort} es la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
+Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, donde \texttt{QSerialPort} es la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase y ofrecer métodos que faciliten la integración con el gestor de protocolo. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.5\textwidth]{./Figures/serial-port-manager.png}
+	\includegraphics[width=0.6\textwidth]{./Figures/serial-port-manager.png}
 	\caption{Diagrama de la clase \texttt{SerialPortManager}.}
 	\label{fig:serial-port-manager}
 \end{figure}
@@ -390,6 +340,8 @@ El gestor de protocolo cumple la función de puente entre \texttt{SerialPortMana
 De manera recíproca, la interacción del usuario con los elementos de la interfaz gráfica produce señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones convierten las operaciones solicitadas en comandos del protocolo, los serializan y los envían a través de \texttt{SerialPortManager}. Por este motivo, la clase ofrece métodos que replican los comandos y respuestas listados en las tablas \ref{tab:proto-commands} y \ref{tab:proto-responses}, respectivamente.
 
 Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar llamada \texttt{SettingsParser} que opera como una máquina de estados: interpreta los comandos relacionados con la transmisión del estado del sistema, reconstruye la estructura \texttt{app::Settings} a partir de los fragmentos recibidos y notifica cuando se finalizó la reconstrucción.
+
+\newpage
 
 \subsection{Diseño de la interfaz gráfica}
 Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece un módulo llamado \texttt{QtQuick Controls} que permite utilizar componentes estándar como botones, entradas de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes ofrecen un tema visual definido por el sistema operativo. Sin embargo, la documentación detalla cómo se pueden personalizar para ofrecer un aspecto más acorde a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
@@ -432,7 +384,7 @@ Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentaci
 
 Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde con la tecnología de la época basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
 
-En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite{mma:ca033}, donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y aumente su robustez frente a problemas de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placa de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
+En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite{mma:ca033}, donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y aumente su robustez frente a problemas de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placas de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
 
 \subsection{Diseño de la placa de entradas}
 \label{hw-entradas}
@@ -440,7 +392,7 @@ Para diseñar la etapa de entrada, se tomó como referencia el circuito propuest
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.75\textwidth]{./Figures/circuit-input-stage.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/circuit-input-stage.png}
 	\caption{Circuito de entrada MIDI.}
 	\label{fig:circuit-input-stage}
 \end{figure}
@@ -476,7 +428,7 @@ De manera análoga a la placa de entradas, la placa de salida fue diseñada de a
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/circuit-output-stage.png}
+	\includegraphics[width=0.5\textwidth]{./Figures/circuit-output-stage.png}
 	\caption{Circuito de salida MIDI.}
 	\label{fig:circuit-output-stage}
 \end{figure}
@@ -506,30 +458,14 @@ En la figura \ref{fig:mrc-outputs-board} se muestran las vistas superior e infer
 \end{figure}
 
 \subsection{Diseño de la placa de usuario}
-La placa de usuario consiste en un soporte de los dieciséis diodos LED y el encoder rotativo que irán montados en el panel frontal. El manejo de cada LED es mediante GPIOs individuales, por lo que serán necesarios dieciséis puertos para la indicación visual, más tres puertos para el monitoreo del encoder. En la figura \ref{fig:circuit-user} se muestra el circuito de la placa de usuario.
+La placa de usuario consiste en un soporte de los dieciséis diodos LED y el encoder rotativo que irán montados en el panel frontal. El manejo de cada LED es mediante GPIOs individuales, por lo que serán necesarios dieciséis puertos para la indicación visual, más tres puertos para el monitoreo del encoder. En la figura \ref{fig:circuit-user} se muestra el circuito de la placa de usuario. En el apéndice \ref{anexo:criterios} se pueden consultar los criterios de elección del modelo de LED y el valor de las resistencias.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/circuit-user.png}
+	\includegraphics[width=0.7\textwidth]{./Figures/circuit-user.png}
 	\caption{Circuito de usuario.}
 	\label{fig:circuit-user}
 \end{figure}
-
-Para la elección del modelo de LED y el valor de las resistencias, se tuvieron en cuenta las siguientes restricciones del microcontrolador \cite{st:stm32f413-ds}, \cite{st:stm32f413-rm}:
-\begin{itemize}
-	\item Tensión de salida del GPIO: 3,3 V
-	\item Corriente máxima por GPIO: 25 mA
-	\item Corriente máxima total por puerto: 120 mA
-\end{itemize}
-
-Con estos criterios se eligió el LTW-220DS5 como LED para el panel frontal. Este modelo posee una corriente de alimentación de 5 mA y una caída de tensión entre 2,7 V y 3,15 V \cite{liteon:ltw220ds5}. Con estos parámetros se determinó el rango de valores límite de resistencias, de acuerdo a la ecuación \ref{eq:resistencias}.
-
-\begin{equation}
-	\label{eq:resistencias}
-	R_{min} = \frac{3,3 V - 3,15 V}{5 mA} = 30 \Omega, R_{max} = \frac{3,3 V - 2,7 V}{5 mA} = 120 \Omega
-\end{equation}
-
-Se adoptó el valor medio (75 $\Omega$) para las resistencias de los LEDs. Este valor cumple la condición de que la corriente media por GPIO es de 5 mA (menor a los 25 mA impuestos por el fabricante), y que si todos los LEDs se encuentran encendidos simultáneamente, el consumo total es de 80 mA, menor a los 120 mA sugeridos.
 
 En la figura \ref{fig:mrc-user-board} se observan las vistas superior e inferior de la placa de usuario.
 
@@ -571,7 +507,7 @@ Para el diseño de la conexión USB y la etapa reguladora se tomó como referenc
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\textwidth]{./Figures/circuit-usb.png}
+	\includegraphics[width=0.7\textwidth]{./Figures/circuit-usb.png}
 	\caption{Circuito del conector USB.}
 	\label{fig:circuit-usb}
 \end{figure}

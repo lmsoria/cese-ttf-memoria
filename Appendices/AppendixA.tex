@@ -1,7 +1,61 @@
 % Appendix A
 
-\chapter{Comandos } % Main appendix title
+\chapter{Mensajes del Protocolo} % Main appendix title
 
-\label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
+\label{anexo:comandos} % For referencing this appendix elsewhere, use \ref{AppendixA}
 
-Write your Appendix content here.
+En el presente apéndice se listan y describen los mensajes desarrollados para comunicar la aplicación de escritorio con el equipo.
+
+\section{Comandos}
+
+\begin{table}[ht]
+	\centering
+	\caption[Comandos del protocolo.]{Comandos del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada comando. }
+	\label{tab:proto-commands}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{ll}
+			\toprule
+			\textbf{Comando}                    & \textbf{Descripción}                                                                                                                                                                           \\
+			\midrule
+			\texttt{GetSettings}                & Obtener la configuración del equipo.                                                                                                                                                            \\
+			\texttt{SetActivePreset}            & Setear el preset \texttt{preset\_number} como activo.                                                                                                                                           \\
+			\texttt{SetPresetName}              & Asignar \texttt{name} al preset \texttt{preset\_number}.                                                                                               \\
+			\texttt{SetIOName}                  & Asignar \texttt{name} a la \texttt{io} \texttt{io\_number}, en el preset  \texttt{preset\_number}.                                                                                               \\
+			\texttt{EnableIO}                   & Habilitar la io \texttt{io\_number}, en el preset \texttt{preset\_number}.                                                                                                                       \\
+			\texttt{RouteIO}                    & \begin{tabular}[c]{@{}l@{}}Rutear la entrada \texttt{input\_number} con la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular} \\
+			\texttt{RouteAllInputsTo}           & \begin{tabular}[c]{@{}l@{}}Rutear todas las entradas a la salida \texttt{output\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                   \\
+			\texttt{RouteAllOutputsTo}          & \begin{tabular}[c]{@{}l@{}}Rutear todas las salidas a la entrada \texttt{input\_number} \\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                     \\
+			\texttt{ResetRoutingFor}            & Resetear la configuración de ruteo para el preset \texttt{preset\_number}.                                                                                                                      \\
+			\texttt{EnableChannelFilter}        & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{channel\_filter} en el canal \texttt{channel\_number} en la \texttt{io}\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular} \\
+			\texttt{EnableAllChannelsForFilter} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los canales para el filtro \texttt{channel\_filter} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
+			\texttt{EnableAllFiltersForChannel} & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros para el canal \texttt{channel\_number} en la io\\ \texttt{io\_number} de acuerdo con \texttt{enabled}, en el preset  \texttt{preset\_number}.\end{tabular}                      \\
+			\texttt{EnableSystemFilter}         & \begin{tabular}[c]{@{}l@{}}Habilitar el filtro \texttt{system\_filter} en la \texttt{io} \texttt{io\_number}\\ de acuerdo con \texttt{enabled}, en el preset \texttt{preset\_number}.\end{tabular}                                      \\
+			\texttt{EnableAllSystemFiltersFor}  & \begin{tabular}[c]{@{}l@{}}Habilitar todos los filtros de sistema en la \texttt{io} \texttt{io\_number} \\ de acuerdo con \texttt{enabled}, en el  preset \texttt{preset\_number}.\end{tabular}                                      \\
+			\texttt{StoreSettings}              & Guardar el estado actual del sistema en memoria.\\
+			\bottomrule
+			\hline
+		\end{tabular}%
+	}
+\end{table}
+
+\section{Respuestas}
+
+\begin{table}[ht]
+	\centering
+	\caption[Respuestas del protocolo.]{Respuestas del protocolo. En \texttt{monoespaciado} se indica la información asociada a cada respuesta.}
+	\label{tab:proto-responses}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{ll}
+			\toprule
+			\textbf{Respuesta}                    & \textbf{Descripción}                                                                   \\
+			\midrule
+			\texttt{Ack}                          & Comando procesado correctamente.                                                       \\
+			\texttt{Nack}                         & Comando recibido, pero no puede ser procesado al momento de la petición.               \\
+			\texttt{Retx}                         & Error en la recepción, se solicita retransmitir el comando.                            \\
+			\texttt{StartSystemStateTransmission}  & \begin{tabular}[c]{@{}l@{}}Se enviará el estado del equipo en \texttt{number\_of\_packets} paquetes \\ de tamaño \texttt{chunk\_size}.\end{tabular} \\
+			\texttt{SystemStateChumk}             & Envío del paquete \texttt{packet\_number} con un buffer \texttt{data}. \\
+			\bottomrule
+			\hline
+		\end{tabular}%
+	}
+\end{table}

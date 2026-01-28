@@ -1,0 +1,25 @@
+% Appendix Template
+
+\chapter{Criterios de elección de componentes} % Main appendix title
+
+\label{anexo:criterios} % Change X to a consecutive letter; for referencing this appendix elsewhere, use \ref{AppendixX}
+
+En el presente apéndice se detallan algunos criterios de elección de componentes durante la etapa de diseño de las placas.
+
+\section{LEDs y resistencias de la placa de usuario}
+
+Para la elección del modelo de LED y el valor de las resistencias, se tuvieron en cuenta las siguientes restricciones del microcontrolador \cite{st:stm32f413-ds}, \cite{st:stm32f413-rm}:
+\begin{itemize}
+	\item Tensión de salida del GPIO: 3,3 V
+	\item Corriente máxima por GPIO: 25 mA
+	\item Corriente máxima total por puerto: 120 mA
+\end{itemize}
+
+Con estos criterios se eligió el LTW-220DS5 como LED para el panel frontal. Este modelo posee una corriente de alimentación de 5 mA y una caída de tensión entre 2,7 V y 3,15 V \cite{liteon:ltw220ds5}. Con estos parámetros se determinó el rango de valores límite de resistencias, de acuerdo a la ecuación \ref{eq:resistencias}.
+
+\begin{equation}
+	\label{eq:resistencias}
+	R_{min} = \frac{3,3 V - 3,15 V}{5 mA} = 30 \Omega, R_{max} = \frac{3,3 V - 2,7 V}{5 mA} = 120 \Omega
+\end{equation}
+
+Se adoptó el valor medio (75 $\Omega$) para las resistencias de los LEDs. Este valor cumple la condición de que la corriente media por GPIO es de 5 mA (menor a los 25 mA impuestos por el fabricante), y que si todos los LEDs se encuentran encendidos simultáneamente, el consumo total es de 80 mA, menor a los 120 mA sugeridos.
