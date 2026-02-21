@@ -2,8 +2,8 @@
 
 \chapter{Conclusiones} % Main chapter title
 
-\label{Chapter5} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+\label{Chapter5}
+En el presente capítulo se presentan las conclusiones más relevantes del trabajo realizado junto con los próximos pasos a seguir.
 
 
 %----------------------------------------------------------------------------------------
@@ -12,26 +12,37 @@ Todos los capítulos deben comenzar con un breve párrafo introductorio que indi
 %	SECTION 1
 %----------------------------------------------------------------------------------------
 
-\section{Conclusiones generales }
+\section{Conclusiones generales}
 
-La idea de esta sección es resaltar cuáles son los principales aportes del trabajo realizado y cómo se podría continuar. Debe ser especialmente breve y concisa. Es buena idea usar un listado para enumerar los logros obtenidos.
+Este trabajo culminó con la realización de un prototipo de un router MIDI funcional que cumplió con la mayoría de los requerimientos establecidos en el plan de proyecto. El proceso abarcó múltiples etapas, desde la fase de diseño hasta el montaje mecánico del equipo. Su ejecución fue llevada a cabo mediante una planificación previa, basada en herramientas de gestión de proyectos.
 
-En esta sección no se deben incluir ni tablas ni gráficos.
-
-Algunas preguntas que pueden servir para completar este capítulo:
+Dado el planteo del equipo como un producto potencial, se aplicaron conocimientos de áreas que exceden la electrónica y la programación de sistemas embebidos. A continuación se enumeran los principales aportes:
 
 \begin{itemize}
-\item ¿Cuál es el grado de cumplimiento de los requerimientos?
-\item ¿Cuán fielmente se puedo seguir la planificación original (cronograma incluido)?
-\item ¿Se manifestó algunos de los riesgos identificados en la planificación? ¿Fue efectivo el plan de mitigación? ¿Se debió aplicar alguna otra acción no contemplada previamente?
-\item Si se debieron hacer modificaciones a lo planificado ¿Cuáles fueron las causas y los efectos?
-\item ¿Qué técnicas resultaron útiles para el desarrollo del proyecto y cuáles no tanto?
+	\item Se aplicaron técnicas modernas de desarrollo de firmware y software mediante C++20, lo que favoreció mayor robustez y menor propensión a errores en tiempo de ejecución.
+	\item Se aplicaron conceptos de ingeniería de software, tales como patrones de diseño, arquitectura y casos de uso, para delimitar responsabilidades entre módulos y orientar su verificación.
+	\item Se aplicaron conceptos de sistemas operativos de tiempo real para estructurar una aplicación concurrente de firmware, capaz de despachar mensajes entre entradas y salidas de forma predecible.
+	\item Se aplicaron herramientas de testing para verificar distintos aspectos de la aplicación, que fueron desde la funcionalidad de bloques aislados (testing unitario), hasta la medición automatizada de la performance del equipo.
+	\item Se consideraron criterios de diseño para manufactura durante el desarrollo de las placas de circuito impreso.
+	\item Se aprendieron conceptos relacionados con UX/UI para desarrollar un software que resulte de uso intuitivo para público no especializado.
 \end{itemize}
 
+De esta forma, el prototipo desarrollado cumple con las necesidades del autor, y al mismo tiempo posee potencial para ser introducido al mercado local.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
 \section{Próximos pasos}
 
-Acá se indica cómo se podría continuar el trabajo más adelante.
+Para poder convertir el prototipo diseñado en un producto comercializable, se identificaron los siguientes puntos de mejora:
+\begin{itemize}
+	\item Incorporar la exposición de las entradas y salidas MIDI a través del puerto USB, para habilitar el control desde la computadora y hacia la computadora.
+	\item Automatizar el proceso de compilación y testing a través de un pipeline de CI/CD (\textit{Continuous Integration/Continuous Deployment}), para poder ofrecer un mecanismo de versionado y trazabilidad más estructurado.
+	\item Reducir copias de memoria en la propagación de mensajes, ya que el despacho actual utiliza múltiples colas con duplicación de bytes.
+	\item Dado que la alimentación es por el puerto USB, agregar algún mecanismo de almacenamiento de energía y detección de desconexión para guardar cambios no aplicados y reestablecer la configuración cuando se reinicie el equipo.
+	\item Evaluar el uso de una variante de 100 pines del microcontrolador, con el objetivo de reducir costo y área de circuito impreso.
+	\item Eliminar componentes prescindibles para la versión final del producto.
+	\item Refinar la experiencia de uso de la aplicación de escritorio, y agregar la posibilidad de actualizar el firmware desde la misma.
+	\item Redactar un manual de usuario.
+	\item Diseñar la serigrafía del frente del equipo.
+\end{itemize}
