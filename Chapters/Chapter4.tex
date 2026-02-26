@@ -296,7 +296,7 @@ La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del um
 
 El histograma exhibe un comportamiento multimodal, donde cada pico se asocia a una posición distinta del mensaje dentro de la cola de salida. La componente base se ubica alrededor de 2 ms, en línea con la latencia global del ensayo \ref{ensayo-4-4}. La figura \ref{fig:test_4-1_boxplot} muestra el diagrama de caja por entrada.
 
-\begin{figure}[H]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/test_4-1_boxplot.png}
 	\caption{Diagrama de caja para el caso 4$\rightarrow$1.}
@@ -306,4 +306,3 @@ El histograma exhibe un comportamiento multimodal, donde cada pico se asocia a u
 El diagrama evidencia incrementos cercanos a 1 ms entre grupos, atribuibles al orden de servicio en la cola de transmisión. Este valor coincide con el tiempo de envío de un mensaje Note On (3 bytes) a 31 250 baudios, igual a 960 $\mu$s.
 
 %----------------------------------------------------------------------------------------
-

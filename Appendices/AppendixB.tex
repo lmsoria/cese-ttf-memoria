@@ -23,3 +23,14 @@ Con estos criterios se eligió el LTW-220DS5 como LED para el panel frontal. Est
 \end{equation}
 
 Se adoptó el valor medio (75 $\Omega$) para las resistencias de los LEDs. Este valor cumple la condición de que la corriente media por GPIO es de 5 mA (menor a los 25 mA impuestos por el fabricante), y que si todos los LEDs se encuentran encendidos simultáneamente, el consumo total es de 80 mA, menor a los 120 mA sugeridos.
+
+
+\section{Resistencia de sobrecorriente}
+De acuerdo a la hoja de datos del ST890 \cite{st:st890}, se puede programar la corriente de protección de acuerdo a la ecuación \ref{eq:ilim}:
+
+\begin{equation}
+	\label{eq:ilim}
+	R_{SET} = 1.24 * \frac{1110}{I_{LIM}}
+\end{equation}
+
+Reemplazando $I_{LIM}$ por 500 mA, se obtiene $R_{SET} = 2752,8\,\Omega$. Se adoptó entonces una resistencia de 2,7 K$\Omega$.

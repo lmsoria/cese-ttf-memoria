@@ -513,7 +513,7 @@ Para el diseño de la conexión USB y la etapa reguladora se tomó como referenc
 	\label{fig:circuit-usb}
 \end{figure}
 
-En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se modificó el circuito original del kit de desarrollo, ya que se deseaba usar un regulador con menor tensión de dropout. Se optó por utilizar el AP7361C, que ofrece 360 mV nominales de caída \cite{diodes:ap7361c}. Por otro lado, se utilizó el ST890 \cite{st:st890} como etapa de protección contra sobrecorriente (limitada a 500 mA).
+En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se modificó el circuito original del kit de desarrollo, ya que se deseaba usar un regulador con menor tensión de dropout. Se optó por utilizar el AP7361C, que ofrece 360 mV nominales de caída \cite{diodes:ap7361c}. Por otro lado, se utilizó el ST890 \cite{st:st890} como etapa de protección contra sobrecorriente. Esta corriente fue limitada a 500 mA. En el apéndice \ref{anexo:criterios} se puede consultar cómo se dimensionó la resistencia de sensado.
 
 \begin{figure}[H]
 	\centering
@@ -531,7 +531,7 @@ La conexión de las entradas MIDI y de la placa de usuario es directa con el mic
 	\label{fig:circuit-out-connector}
 \end{figure}
 
-Además de lo mencionado explícitamente, durante la etapa de diseño se agregaron otros elementos que solo se mencionan:
+Además de lo mencionado explícitamente, durante la etapa de diseño se agregaron otros elementos:
 \begin{itemize}
 	\item Cristal de 10 MHz.
 	\item Capacitores de desacople.
@@ -546,18 +546,16 @@ En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}{0.6\textwidth}
+	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{./Figures/mrc-main-board-top.png}
 		\caption{Vista superior.}
 		\label{fig:mrc-main-board-top}
 	\end{subfigure}
-
-	\hspace{0.5em}
-
-	\begin{subfigure}{0.6\textwidth}
+	\hfill
+	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-main-board-bottom}
+		\includegraphics[width=\textwidth]{./Figures/mrc-main-board-bottom.png}
 		\caption{Vista inferior.}
 		\label{fig:mrc-main-board-bottom}
 	\end{subfigure}
@@ -575,7 +573,7 @@ Dado que son gabinetes estandarizados, se contactó con un productor, y se coord
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{./Figures/render.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/render.png}
 	\caption{Render del gabinete diseñado.}
 	\label{fig:render}
 \end{figure}
@@ -584,7 +582,7 @@ Una vez modelado el panel frontal, se procedió con exportar un archivo \texttt{
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{./Figures/gabinete.jpg}
+	\includegraphics[width=0.8\textwidth]{./Figures/gabinete.jpg}
 	\caption{Gabinete ensamblado.}
 	\label{fig:gabinete}
 \end{figure}
