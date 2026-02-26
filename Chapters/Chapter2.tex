@@ -176,13 +176,7 @@ Dado que MIDI es un estándar basado en comunicación serie, para la etapa inici
 En esta sección se describen las principales herramientas de software y bibliotecas de terceros empleadas para el desarrollo del firmware del equipo.
 
 \subsection{Toolchain utilizado}
-Se optó por utilizar el lenguaje C++20 \cite{ISO:14882-2020} para el desarrollo de la aplicación principal, mientras que las bibliotecas de terceros están desarrolladas en el lenguaje de programación C \cite{st:um1725}, \cite{freertos:c-dev-tools}. Para ambos casos se empleó ARM GNU Toolchain, versión 14.3, como herramienta de compilación cruzada para la arquitectura ARM. Este conjunto de herramientas provee, entre otras, las siguientes utilidades:
-\begin{itemize}
-    \item Compiladores: \texttt{gcc} y \texttt{g++}
-	\item Enlazador: \texttt{ld}
-	\item Ensamblador: \texttt{as}
-	\item Depurador: \texttt{gdb}
-\end{itemize}
+Se optó por utilizar el lenguaje C++20 \cite{ISO:14882-2020} para el desarrollo de la aplicación principal, mientras que las bibliotecas de terceros están desarrolladas en el lenguaje de programación C \cite{st:um1725}, \cite{freertos:c-dev-tools}. Para ambos casos se empleó ARM GNU Toolchain, versión 14.3, como herramienta de compilación cruzada para la arquitectura ARM.
 
 \subsection{Biblioteca HAL}
 
@@ -199,6 +193,9 @@ La utilización de esta biblioteca permitió incorporar una interfaz de comunica
 \subsection{Sistema operativo en tiempo real FreeRTOS}
 
 Como sistema operativo en tiempo real se utilizó FreeRTOS \cite{freertos:kernel}, un kernel ampliamente difundido en sistemas embebidos de recursos acotados. FreeRTOS proporciona mecanismos de planificación de tareas, colas de mensajes, semáforos y temporizadores de software, entre otros servicios básicos necesarios para estructurar aplicaciones concurrentes sobre microcontroladores.
+
+\subsection{Herramientas de testing}
+Se utilizó GoogleTest \cite{googletest} para implementar y correr los tests unitarios de los módulos desarrollados. Por otro lado, se utilizó Python 3.10 \cite{python} para automatizar las pruebas de latencia y procesar los resultados generados.
 
 %----------------------------------------------------------------------------------------
 
