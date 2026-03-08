@@ -190,7 +190,7 @@ Para analizar el comportamiento por salida se construyó un diagrama de caja, qu
 	\label{fig:test_1-8_boxplot}
 \end{figure}
 
-Esta representación permite comparar de manera visual la dispersión y el desfasaje temporal introducidos por el proceso de ruteo. La propagación de los mensajes evidencia un barrido temporal entre salidas, en el cual la salida 1 presenta precedencia respecto de las restantes, siguiendo un orden creciente. La caracterización de este desfasaje resulta relevante, dado que en un contexto de ejecución musical los eventos deben dispararse de la forma más simultánea posible. En la figura \ref{fig:test_1_8_skew} se presenta un histograma del desfasaje entre salidas, donde se observa que este no supera los 300 $\mu$s.
+Esta representación permite comparar de manera visual la dispersión y el desfasaje temporal introducidos por el proceso de ruteo. La propagación de los mensajes evidencia un barrido temporal entre salidas, en el cual la salida 1 presenta precedencia respecto de las restantes, que se ordenan de manera creciente. La caracterización de este desfasaje resulta relevante, dado que en un contexto de ejecución musical los eventos deben dispararse de la forma más simultánea posible. En la figura \ref{fig:test_1_8_skew} se presenta un histograma del desfasaje entre salidas, donde se observa que este no supera los 300 $\mu$s.
 
 \begin{figure}[H]
 	\centering
@@ -219,7 +219,7 @@ De manera análoga al ensayo de la subsección \ref{ensayo-1-8}, se desarrolló 
 	\caption[Estadísticas de latencias para el caso $4 \rightarrow 4$]
 	{Estadísticas de latencias para el caso $4 \rightarrow 4$.}
 	\label{tab:test-latency-4-4-stats}
-	\resizebox{0.6\textwidth}{!}{%
+	\resizebox{0.7\textwidth}{!}{%
 		\begin{tabular}{ccccc}
 			\toprule
 			\textbf{Salida} & \textbf{Mínimo {[}$\mu s${]}} & \textbf{Media {[}$\mu s${]}} & \textbf{Máximo {[}$\mu s${]}} & \textbf{Desviación {[}$\mu s${]}} \\
@@ -271,7 +271,7 @@ Dado que múltiples entradas compiten por el mismo recurso de transmisión, se e
 	\caption[Estadísticas de latencias para el caso $4 \rightarrow 1$]
 	{Estadísticas de latencias para el caso $4 \rightarrow 1$.}
 	\label{tab:test-latency-4-1-stats}
-	\resizebox{0.6\textwidth}{!}{%
+	\resizebox{0.7\textwidth}{!}{%
 		\begin{tabular}{ccccc}
 			\toprule
 			\textbf{Entrada} & \textbf{Mínimo {[}$\mu s${]}} & \textbf{Media {[}$\mu s${]}} & \textbf{Máximo {[}$\mu s${]}} & \textbf{Desviación {[}$\mu s${]}} \\
