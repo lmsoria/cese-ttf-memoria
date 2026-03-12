@@ -86,7 +86,7 @@ Para desarrollar la aplicación se segmentó la funcionalidad en capas con difer
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.55\textwidth]{./Figures/fw-layers.png}
+	\includegraphics[width=0.7\textwidth]{./Figures/fw-layers.png}
 	\caption{Arquitectura de capas utilizada.}
 	\label{fig:fw-layers}
 \end{figure}
@@ -140,8 +140,8 @@ Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos
 	\item \texttt{ButtonPressed}: se detectó una pulsación simple.
 	\item \texttt{ButtonDoublePressed}: se detectó una pulsación doble dentro de una ventana temporal configurable.
 	\item \texttt{ButtonLongPressed}: se detectó una pulsación prolongada, con duración superior al umbral configurado.
-	\item \texttt{DialCW}: el encoder ha rotado en sentido horario.
-	\item \texttt{DialCCW}: el encoder ha rotado en sentido antihorario.
+	\item \texttt{DialCW}: se detectó un giro en sentido horario.
+	\item \texttt{DialCCW}: se detectó un giro en sentido antihorario.
 \end{itemize}
 
 \subsection{Diseño del servicio de LEDs}
@@ -363,7 +363,7 @@ La aplicación consiste en tres sectores:
 \end{enumerate}
 
 %----------------------------------------------------------------------------------------
-
+\newpage
 %----------------------------------------------------------------------------------------
 
 \section{Desarrollo del hardware} % 1 página
@@ -401,29 +401,6 @@ Para diseñar la etapa de entrada, se tomó como referencia el circuito propuest
 
 Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 K$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas permiten una fácil soldadura manual.
 
-En base al circuito de la figura \ref{fig:circuit-input-stage} se diseñó la placa de entradas de la figura \ref{fig:mrc-inputs-board}.
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}{0.75\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-inputs-board-top}
-		\caption{Vista superior.}
-		\label{fig:mrc-inputs-board-top}
-	\end{subfigure}
-
-	\vspace{0.5em}
-
-	\begin{subfigure}{0.75\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-inputs-board-bottom}
-		\caption{Vista inferior.}
-		\label{fig:mrc-inputs-board-bottom}
-	\end{subfigure}
-
-	\caption{Placa de entradas MIDI.}
-	\label{fig:mrc-inputs-board}
-\end{figure}
-
 \subsection{Diseño de la placa de salidas}
 \label{hw-salidas}
 De manera análoga a la placa de entradas, la placa de salida fue diseñada de acuerdo a los lineamientos de \cite{mma:ca033}. Se optó por dejar la etapa de buffers en la placa principal, para que se encuentre más cercana al microcontrolador. Por lo tanto, la placa de salidas solamente posee los conectores y los componentes pasivos para compatibilidad EMI/EMC. En la figura \ref{fig:circuit-output-stage} se observa el bloque funcional de una salida, que luego fue replicado ocho veces.
@@ -435,30 +412,6 @@ De manera análoga a la placa de entradas, la placa de salida fue diseñada de a
 	\label{fig:circuit-output-stage}
 \end{figure}
 
-En la figura \ref{fig:mrc-outputs-board} se muestran las vistas superior e inferior de la placa de salida diseñada.
-
-\begin{figure}[!htpb]
-	\centering
-	\begin{subfigure}{\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-outputs-board-top}
-		\caption{Vista superior.}
-		\label{fig:mrc-outputs-board-top}
-	\end{subfigure}
-
-	\vspace{0.5em}
-
-	\begin{subfigure}{\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-outputs-board-bottom}
-		\caption{Vista inferior.}
-		\label{fig:mrc-outputs-board-bottom}
-	\end{subfigure}
-
-	\caption{Placa de salidas MIDI.}
-	\label{fig:mrc-outputs-board}
-\end{figure}
-
 \subsection{Diseño de la placa de usuario}
 La placa de usuario consiste en un soporte de los dieciséis diodos LED y el encoder rotativo que irán montados en el panel frontal. El manejo de cada LED es mediante GPIOs individuales, por lo que serán necesarios dieciséis puertos para la indicación visual, más tres puertos para el monitoreo del encoder. En la figura \ref{fig:circuit-user} se muestra el circuito de la placa de usuario. En el apéndice \ref{anexo:criterios} se pueden consultar los criterios de elección del modelo de LED y el valor de las resistencias.
 
@@ -468,31 +421,6 @@ La placa de usuario consiste en un soporte de los dieciséis diodos LED y el enc
 	\caption{Circuito de usuario.}
 	\label{fig:circuit-user}
 \end{figure}
-
-En la figura \ref{fig:mrc-user-board} se observan las vistas superior e inferior de la placa de usuario.
-
-\begin{figure}[!htpb]
-	\centering
-	\begin{subfigure}{0.65\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-user-board-top}
-		\caption{Vista superior.}
-		\label{fig:mrc-user-board-top}
-	\end{subfigure}
-
-	\vspace{0.5em}
-
-	\begin{subfigure}{0.65\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{./Figures/mrc-user-board-bottom}
-		\caption{Vista inferior.}
-		\label{fig:mrc-user-board-bottom}
-	\end{subfigure}
-
-	\caption{Placa de usuario.}
-	\label{fig:mrc-user-board}
-\end{figure}
-
 
 \subsection{Diseño de la placa central}
 
@@ -580,7 +508,3 @@ Dado que son gabinetes estandarizados, se contactó a un proveedor para coordina
 \end{figure}
 
 %----------------------------------------------------------------------------------------
-
-
-
-
