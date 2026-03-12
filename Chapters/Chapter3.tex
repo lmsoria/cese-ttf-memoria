@@ -124,20 +124,9 @@ Cada uno de estos servicios requiere un conjunto de dependencias para operar cor
 Por otro lado, la comunicación entre los servicios y la aplicación se hace mediante el patrón de Objeto Activo \cite{lavender-schmidt:active-object}, en donde una tarea monitorea el estado de una cola de eventos que son procesados de manera diferida. Estos eventos son estructuras de datos que los servicios generan de manera asíncrona y pueden contener o no información asociada.
 
 \subsection{Diseño del servicio de dial}
-El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador. En la figura \ref{fig:rotary-encoder} se muestra una fotografía de un encoder típico, montado en una placa tipo breakout para prototipos.
+El servicio \texttt{svc::dial} se encarga de monitorear un encoder rotativo con pulsador y de determinar tanto las pulsaciones del botón como el sentido de giro a partir de dos señales en cuadratura.
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.25\textwidth]{./Figures/rotary-encoder.jpg}
-	\caption{Encoder rotativo con pulsador\protect\footnotemark.}
-	\label{fig:rotary-encoder}
-\end{figure}
-
-\footnotetext{Imagen tomada de \url{https://thepihut.com/cdn/shop/articles/DSC_0700.jpg}.}
-
-Estos encoders poseen tres señales: una es el pulsador, y las otras dos, denominadas \texttt{CLK} y \texttt{DT}, generan una onda cuadrada desfasada 90 grados cuando el encoder rota. La fase relativa entre ambas señales determina el sentido de giro del dial.
-
-En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \texttt{svc::dial}. Este consiste en una tarea que muestrea periódicamente tres GPIOs configurados como entradas, donde se aplican mecanismos de antirrebote y se procesa la señal en cuadratura para determinar el estado del dial.
+En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio. Este consiste en una tarea que muestrea periódicamente tres GPIOs configurados como entradas, donde se aplican mecanismos de antirrebote y se procesa la señal en cuadratura para determinar el estado del dial.
 
 \begin{figure}[ht]
 	\centering
@@ -155,11 +144,10 @@ Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos
 	\item \texttt{DialCCW}: el encoder ha rotado en sentido antihorario.
 \end{itemize}
 
-
 \subsection{Diseño del servicio de LEDs}
 El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs del panel frontal. En la figura \ref{fig:svc-led} se ilustra un diagrama en bloque de la estructura del servicio.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{./Figures/svc-led.png}
 	\caption{Diagrama en bloques del servicio de LEDs.}
@@ -168,7 +156,7 @@ El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs d
 
 El servicio consiste en una tarea que actualiza periódicamente el estado de los LEDs. El uso de una tarea permite implementar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como la de la figura \ref{fig:svc-led-fsm}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-led-fsm.png}
 	\caption{Máquina de estados del servicio de LEDs.}
@@ -182,18 +170,8 @@ Se definieron tres animaciones:
 	\item \texttt{Blink}: este estado se utiliza para indicarle al usuario que un preset se guardó como activo. Para ello se invoca el método \texttt{confirm\_saved()}. La animación consiste en hacer un destello intermitente dos veces. Cuando finaliza, se transiciona al estado \texttt{Steady}.
 \end{enumerate}
 
-
-\newpage
-
 \subsection{Diseño del servicio de almacenamiento}
-La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y escribir la configuración del sistema, modelada mediante la estructura \texttt{app::Settings} mencionada en la sección \ref{diagrama-bloques-sistema}. En la figura \ref{fig:svc-storage} se ilustra un diagrama en bloques del servicio.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/svc-storage.png}
-	\caption{Diagrama en bloques del servicio de almacenamiento.}
-	\label{fig:svc-storage}
-\end{figure}
+La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y escribir la configuración del sistema, modelada mediante la estructura \texttt{app::Settings} mencionada en la sección \ref{diagrama-bloques-sistema}.
 
 \subsection{Diseño del servicio de I/O}
 \label{subsection:io}
@@ -228,8 +206,42 @@ El proceso de transmisión es un procedimiento más simple, tal como puede obser
 
 Una vez que el mensaje se serializa, su contenido se copia en el buffer circular de la UART para su posterior transmisión. Con este paso concluye el proceso.
 
+%\subsection{Diseño del servicio de comunicación}
+%El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación con la aplicación de escritorio mediante la emulación de un puerto serie virtual por USB. En la figura \ref{fig:svc-comms} se observa un diagrama en bloques del servicio.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=\textwidth]{./Figures/svc-comms.png}
+%	\caption{Diagrama en bloques del servicio de comunicación.}
+%	\label{fig:svc-comms}
+%\end{figure}
+%
+%En líneas generales, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=0.8\textwidth]{./Figures/proto-command.png}
+%	\caption{Estructuras utilizadas en el protocolo de comandos.}
+%	\label{fig:proto-command}
+%\end{figure}
+%
+%Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste en un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agregó un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad futura, se agregó un campo que representa la versión del protocolo.
+%
+%El contenido de cada mensaje es, a su vez, una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para procesarlos y generar la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia que representa el intercambio de mensajes entre la aplicación y el firmware.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics[width=0.7\textwidth]{./Figures/proto-sequence.png}
+%	\caption{Diagrama de secuencia del procesamiento de comandos del protocolo.}
+%	\label{fig:proto-sequence}
+%\end{figure}
+%
+%En caso de que haya un error en la deserialización del comando recibido, el servicio se encarga de enviar un pedido de retransmisión (\texttt{Retx}) como respuesta.
+%
+%De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
+
 \subsection{Diseño del servicio de comunicación}
-El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación con la aplicación de escritorio mediante la emulación de un puerto serie virtual por USB. En la figura \ref{fig:svc-comms} se observa un diagrama en bloques del servicio.
+El servicio \texttt{svc::comms} gestiona la comunicación con la aplicación de escritorio a través de un puerto serie virtual sobre USB. En la figura \ref{fig:svc-comms} se muestra un diagrama en bloques del servicio.
 
 \begin{figure}[ht]
 	\centering
@@ -238,33 +250,24 @@ El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación co
 	\label{fig:svc-comms}
 \end{figure}
 
-En líneas generales, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
+En términos generales, el servicio consta de dos tareas: una destinada a la recepción y decodificación de comandos, y otra destinada a la codificación y transmisión de respuestas. La definición de comandos, respuestas y funciones auxiliares se implementó en una biblioteca independiente llamada \texttt{protocol}, compartida también con la aplicación de escritorio. En la figura \ref{fig:proto-command} se presenta un diagrama de clases de las estructuras principales del protocolo.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{./Figures/proto-command.png}
+	\includegraphics[width=\textwidth]{./Figures/proto-command.png}
 	\caption{Estructuras utilizadas en el protocolo de comandos.}
 	\label{fig:proto-command}
 \end{figure}
 
-Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste en un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agregó un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad futura, se agregó un campo que representa la versión del protocolo.
+Cada mensaje se representa mediante la plantilla \texttt{proto::Packet<T>}, compuesta por un encabezado (\texttt{proto::Header}), una carga útil y un código CRC (\textit{Cyclic Redundancy Check}) para verificación de integridad. El encabezado contiene el identificador del comando (\texttt{CommandID}) y el tamaño de la carga útil. Además, se incorporó un campo fijo de 32 bits llamado \texttt{magic}, que permite detectar el inicio de una trama, y un campo de versión para preservar compatibilidad futura entre revisiones del protocolo.
 
-El contenido de cada mensaje es, a su vez, una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para procesarlos y generar la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia que representa el intercambio de mensajes entre la aplicación y el firmware.
+Una vez validada y decodificada la trama, el servicio envía eventos a la aplicación principal para su procesamiento y para la generación de la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra el intercambio de mensajes entre la aplicación y el firmware. Si se detecta un error durante la decodificación o en la verificación de integridad, el servicio responde con un pedido de retransmisión (\texttt{Retx}).
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\textwidth]{./Figures/proto-sequence.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/proto-sequence.png}
 	\caption{Diagrama de secuencia del procesamiento de comandos del protocolo.}
 	\label{fig:proto-sequence}
-\end{figure}
-
-En caso de que haya un error en la deserialización del comando recibido, el servicio se encarga de enviar un pedido de retransmisión (\texttt{Retx}) como respuesta. Este flujo se observa en la figura \ref{fig:proto-invalid}.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.7\textwidth]{./Figures/proto-invalid.png}
-	\caption{Diagrama de secuencia del procesamiento de una trama inválida.}
-	\label{fig:proto-invalid}
 \end{figure}
 
 De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
@@ -341,8 +344,6 @@ El gestor de protocolo cumple la función de puente entre \texttt{SerialPortMana
 De manera recíproca, la interacción del usuario con los elementos de la interfaz gráfica produce señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones convierten las operaciones solicitadas en comandos del protocolo, los serializan y los envían a través de \texttt{SerialPortManager}. Por este motivo, la clase ofrece métodos que replican los comandos y respuestas listados en las tablas \ref{tab:proto-commands} y \ref{tab:proto-responses}, respectivamente.
 
 Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar llamada \texttt{SettingsParser} que opera como una máquina de estados: interpreta los comandos relacionados con la transmisión del estado del sistema, reconstruye la estructura \texttt{app::Settings} a partir de los fragmentos recibidos y notifica cuando se finalizó la reconstrucción.
-
-\newpage
 
 \subsection{Implementación de la interfaz gráfica}
 Para la implementación de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece el módulo \texttt{QtQuick Controls}, que permite emplear componentes estándar como botones, campos de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes proveen un estilo visual definido por el sistema operativo. No obstante, la documentación también describe mecanismos de personalización que permiten adaptar su apariencia a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
@@ -569,16 +570,7 @@ En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior
 
 Las placas de circuito impreso fueron diseñadas con la intención de ser alojadas en un gabinete tipo rack de 19 pulgadas, ya que están estandarizados para equipamiento electrónico e informático. Estos gabinetes se dimensionan mediante unidades de rack (1 U equivale a 1,75 pulgadas). Se estableció como requerimiento usar un gabinete de 1 RU.
 
-Dado que son gabinetes estandarizados, se contactó a un proveedor para coordinar el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. En la figura \ref{fig:render} se muestra un render con el despiece de las placas, el gabinete y el panel frontal.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.8\textwidth]{./Figures/render.png}
-	\caption{Render del gabinete diseñado.}
-	\label{fig:render}
-\end{figure}
-
-Una vez modelado el panel frontal, se exportó el archivo \texttt{.dxf} requerido por el fabricante para realizar el mecanizado. En la figura \ref{fig:gabinete} se observa una fotografía del equipo ensamblado en el gabinete, con la tapa superior removida para mayor visibilidad.
+Dado que son gabinetes estandarizados, se contactó a un proveedor para coordinar el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. Una vez modelado el panel frontal, se exportó el archivo \texttt{.dxf} requerido por el fabricante para realizar el mecanizado. En la figura \ref{fig:gabinete} se observa una fotografía del equipo ensamblado en el gabinete, con la tapa superior removida para mayor visibilidad.
 
 \begin{figure}[H]
 	\centering
