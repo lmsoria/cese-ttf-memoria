@@ -44,7 +44,7 @@ En este capítulo se detalla el proceso de desarrollo del equipo. Se describen l
 %----------------------------------------------------------------------------------------
 
 \section{Diagrama en bloques del sistema} \label{diagrama-bloques-sistema}
-El trabajo desarrollado consiste en dos grandes bloques. Por un lado se encuentra el firmware (que corre en la plataforma de hardware), y por el otro lado software que corre nativamente en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
+El trabajo desarrollado consiste en dos grandes bloques. Por un lado, se encuentra el firmware, que se ejecuta en la plataforma de hardware; por otro, el software que se ejecuta nativamente en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
 
 \begin{figure}[ht]
 	\centering
@@ -58,7 +58,7 @@ El firmware se encarga de realizar íntegramente el procesamiento del flujo de d
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/app-settings.png}
-	\caption{Diagrama en clases de las estructuras de datos principales de la aplicación.}
+	\caption{Diagrama de clases de las estructuras de datos principales de la aplicación.}
 	\label{fig:app-settings}
 \end{figure}
 
@@ -69,8 +69,8 @@ En el diagrama, las estructuras se organizan de menor a mayor jerarquía de la s
 	\item \texttt{ChannelFilters}: cumple la misma funcionalidad que \texttt{SystemFilters}, con la salvedad de que, como los mensajes de canal tienen un canal asociado, esta estructura es un arreglo de dieciséis \texttt{std::bitset} de 7 bits.
 	\item \texttt{RouterSettings}: el ruteo entre entradas y salidas también se modela con un \texttt{std::bitset}. Dado que el sistema posee 4 entradas y 8 salidas, esta estructura es un arreglo de cuatro \texttt{std::bitset} de 8 bits.
 	\item \texttt{IOSettings}: esta estructura encapsula todas las propiedades que se pueden modificar en las entradas y salidas: un nombre, la configuración de filtros y si se encuentra habilitada o no.
-	\item \texttt{Preset}: contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además se le agrega un nombre para que el usuario también pueda identificarla.
-	\item \texttt{Settings}: contiene el estado de los dieciséis preset, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
+	\item \texttt{Preset}: contiene la configuración de todas las entradas y salidas, así como la configuración de ruteo entre ellas. Además, incluye un nombre para que el usuario también pueda identificarla.
+	\item \texttt{Settings}: contiene el estado de los dieciséis presets, el número de preset activo, la versión y un identificador único que se utiliza para operaciones de serialización.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -95,14 +95,14 @@ A continuación, se detalla la funcionalidad de cada una de ellas:
 \begin{itemize}
 	\item \texttt{Hardware}: no es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
 	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se incluye también la biblioteca USB desarrollada por ST.
-	\item \texttt{freeRTOS}: es la biblioteca de freeRTOS, desarrollada por terceros \cite{freertos:rtos-book}.
+	\item \texttt{freeRTOS}: es la biblioteca de FreeRTOS, desarrollada por terceros \cite{freertos:rtos-book}.
 	\item \texttt{os}: es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
 	\item \texttt{hal}: es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
-	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, más relacionadas con los requerimientos de la aplicación.
+	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, relacionadas con los requerimientos de la aplicación.
 	\item \texttt{app}: capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
 \end{itemize}
 
-En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
+Con base en el esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
 
 \begin{figure}[ht]
 	\centering
@@ -114,10 +114,10 @@ En base al esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa
 La aplicación consiste en cinco tipos de servicios o sistemas que interactúan entre sí:
 \begin{enumerate}
 	\item \texttt{svc::dial}: es el encargado de monitorear el estado del encoder rotativo y reportar interacciones con el usuario.
-	\item \texttt{svc::led}: controla los LEDs del panel frontal, con la intención principal de indicar el número de preset activo.
+	\item \texttt{svc::led}: controla los LEDs del panel frontal, con la función principal de indicar el preset activo.
 	\item \texttt{svc::storage}: se encarga de leer y escribir la configuración de la aplicación en la memoria interna del microcontrolador.
 	\item \texttt{svc::comms}: gestiona la comunicación con la computadora. Es la encargada de serializar y deserializar los comandos establecidos por el protocolo diseñado para la comunicación entre el firmware y el software.
-	\item \texttt{svc::io}: es el que controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes
+	\item \texttt{svc::io}: controla la recepción y transmisión de mensajes MIDI entre las entradas y las salidas. Esto incluye el ruteo y filtrado de mensajes.
 \end{enumerate}
 
 Cada uno de estos servicios requiere un conjunto de dependencias para operar correctamente. La capa de aplicación es la encargada de instanciarlas e inyectarlas.
@@ -148,9 +148,9 @@ En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio \
 
 Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos son enviados a la aplicación principal:
 \begin{itemize}
-	\item \texttt{ButtonPressed}: el botón ha sido apretado una sola vez.
-	\item \texttt{ButtonDoublePressed}: el botón ha sido apretado dos veces en una ventana de tiempo corta (configurable a través de una constante de compilación).
-	\item \texttt{ButtonLongPressed}: el botón ha sido apretado y retenido por un intervalo de tiempo largo (configurable a través de una constante de compilación).
+	\item \texttt{ButtonPressed}: se detectó una pulsación simple.
+	\item \texttt{ButtonDoublePressed}: se detectó una pulsación doble dentro de una ventana temporal configurable.
+	\item \texttt{ButtonLongPressed}: se detectó una pulsación prolongada, con duración superior al umbral configurado.
 	\item \texttt{DialCW}: el encoder ha rotado en sentido horario.
 	\item \texttt{DialCCW}: el encoder ha rotado en sentido antihorario.
 \end{itemize}
@@ -197,7 +197,7 @@ La función de \texttt{svc::storage} es la de ofrecer una interfaz para leer y e
 
 \subsection{Diseño del servicio de I/O}
 \label{subsection:io}
-El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encargado de procesar el flujo de mensajes MIDI desde las entradas hasta las salidas. En la figura \ref{fig:svc-io} se observa un diagrama en bloques del servicio.
+El servicio \texttt{svc::io} constituye el núcleo de la aplicación, ya que se encarga de procesar el flujo de mensajes MIDI desde las entradas hacia las salidas. En la figura \ref{fig:svc-io} se observa un diagrama en bloques del servicio.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-io.png}
@@ -205,7 +205,7 @@ El servicio \texttt{svc::io} es el núcleo de la aplicación, ya que es el encar
 	\label{fig:svc-io}
 \end{figure}
 
-Dado que hay UARTs que operan como entrada o como entrada-salida, el servicio de I/O admite distintas especializaciones, determinadas por el parámetro \texttt{Mode}, que puede ser \texttt{Input} (solo entrada), \texttt{Output} (solo salida) o \texttt{InputOutput} (entrada y salida). Si el servicio admite entrada, se instancia una tarea encargada de procesar los mensajes provenientes de la UART. Por otra parte, si el servicio admite salida, se instancia una tarea encargada de procesar los mensajes recibidos y transmitirlos por la UART.
+Dado que existen UARTs que operan como entrada o como entrada-salida, el servicio de I/O admite distintas especializaciones, determinadas por el parámetro \texttt{Mode}, que puede ser \texttt{Input} (solo entrada), \texttt{Output} (solo salida) o \texttt{InputOutput} (entrada y salida). Si el servicio admite entrada, se instancia una tarea encargada de procesar los mensajes provenientes de la UART. Por otra parte, si el servicio admite salida, se instancia una tarea encargada de procesar los mensajes recibidos y transmitirlos por la UART.
 
 El flujo de entrada-salida sigue un patrón de diseño conocido como segmentación de procesos. Este permite transformar datos de una representación a otra mientras se mueven secuencialmente desde un productor a un consumidor \cite{sommerville:ingenieria-sw}. Para ilustrar este concepto, en las figuras \ref{fig:svc-in-pipe} y \ref{fig:svc-out-pipe} se representan los flujos de datos en las tareas de recepción y transmisión de mensajes, respectivamente.
 
@@ -218,7 +218,7 @@ El flujo de entrada-salida sigue un patrón de diseño conocido como segmentaci�
 
 La tarea de recepción incluye más etapas, ya que es necesario convertir la información binaria recibida por la UART en mensajes MIDI. Para ello, se cuenta con una clase llamada \texttt{app::Parser} encargada de convertir una secuencia de bytes en una secuencia de mensajes MIDI. Una vez detectados los tipos de mensaje recibidos, se procede a filtrarlos. La clase \texttt{app::Filter} verifica en la configuración de usuario si el mensaje se encuentra bloqueado. En caso negativo, se transmite a la siguiente etapa, donde la clase \texttt{app::Router} consulta en la configuración a qué salidas debe propagarse. Los procesos de recepción y transmisión se gestionan en tareas diferentes. Dado que más de una tarea de entrada puede escribir sobre una misma tarea de salida, se utilizan colas de mensajes como mecanismo de sincronización para enviar los mensajes MIDI desde las entradas hacia las salidas. FreeRTOS garantiza que estas estructuras son aptas para situaciones de concurrencia \cite{freertos:queues}.
 
-El proceso de transmisión involucra menos pasos, tal como puede observarse en la figura \ref{fig:svc-out-pipe}. La tarea permanece bloqueada hasta que aparezcan mensajes en la cola. Ante la presencia de ellos se procede a consultar la configuración del filtro de la salida. Si el mensaje no debe ser bloqueado, se procede a transmitirlo por el puerto serie. Para ello es necesario serializar primero el mensaje, responsabilidad de la clase \texttt{app::Serializer}.
+El proceso de transmisión es un procedimiento más simple, tal como puede observarse en la figura \ref{fig:svc-out-pipe}. La tarea permanece bloqueada hasta que ingresan mensajes en la cola. Ante la llegada de mensajes, se consulta la configuración del filtro de la salida. Si el mensaje no debe ser bloqueado, se transmite por el puerto serie. Para ello es necesario serializar primero el mensaje, responsabilidad que corresponde a la clase \texttt{app::Serializer}.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/svc-out-pipe.png}
@@ -238,7 +238,7 @@ El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación co
 	\label{fig:svc-comms}
 \end{figure}
 
-A grandes rasgos, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
+En líneas generales, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
 
 \begin{figure}[ht]
 	\centering
@@ -267,7 +267,7 @@ En caso de que haya un error en la deserialización del comando recibido, el ser
 	\label{fig:proto-invalid}
 \end{figure}
 
-Con esta premisa se sientan las bases del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
+De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
 
 %----------------------------------------------------------------------------------------
 
@@ -275,7 +275,7 @@ Con esta premisa se sientan las bases del protocolo de comunicación. En el apé
 
 \section{Desarrollo del software} % 1 página
 
-En esta sección se describe el desarrollo de la aplicación de escritorio, desarrollada con el framework Qt6.
+En esta sección se describe el desarrollo de la aplicación de escritorio implementada con Qt6.
 
 \subsection{Arquitectura de la aplicación}
 
@@ -288,18 +288,18 @@ La aplicación se implementa como un único hilo de ejecución que instancia tod
 	\label{fig:sw-arch}
 \end{figure}
 
-Para integrar las funcionalidades disponibles por Qt, las clases desarrolladas por los consumidores deben heredar de primitivas expuestas por la API (\textit{Application Public Interface}). Entre dichas primitivas, la más fundamental es \texttt{QObject} \cite{qt:qobject}. Esta clase da acceso a mecanismos de comunicación entre clases mediante señales, incorporación de metadatos y organización del ciclo de vida mediante árboles de jerarquía, entre otras características \cite{qt:object-model}.
+Para integrar las funcionalidades provistas por Qt, las clases desarrolladas para la aplicación deben heredar de primitivas expuestas por la API (\textit{Application Programming Interface}). Entre dichas primitivas, la más fundamental es \texttt{QObject} \cite{qt:qobject}. Esta clase da acceso a mecanismos de comunicación entre clases mediante señales, incorporación de metadatos y organización del ciclo de vida mediante árboles de jerarquía, entre otras características \cite{qt:object-model}.
 
 Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliotecas que ofrece. Para este trabajo se utilizaron tres:
 \begin{enumerate}
-	\item \texttt{Qt6::Core}: es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la cual se construyen las demás funcionalidades \cite{qt:core}.
+	\item \texttt{Qt6::Core}: es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la que se construyen las demás funcionalidades \cite{qt:core}.
 
 	\item \texttt{Qt6::SerialPort}: es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
 
-	\item \texttt{Qt6::Quick}: es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos y aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
+	\item \texttt{Qt6::Quick}: es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos, además de aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
 \end{enumerate}
 
-Además, se reutilizó la biblioteca \texttt{protocol} utilizada en el firmware para tener acceso a los tipos de datos que representan los comandos, así como los mecanismos de serialización y deserialización.
+Además, se reutilizó la biblioteca \texttt{protocol} desarrollada en el firmware para tener acceso a los tipos de datos que representan los comandos, así como los mecanismos de serialización y deserialización.
 
 La aplicación consiste en tres grandes módulos, cada uno con responsabilidades definidas:
 \begin{enumerate}
@@ -308,7 +308,7 @@ La aplicación consiste en tres grandes módulos, cada uno con responsabilidades
 	\item La interfaz de usuario, desarrollada en QML.
 \end{enumerate}
 
-Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware (figura \ref{fig:app-settings}), con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
+Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware como se muestra en \ref{fig:app-settings}, con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
 
 \subsection{Diseño del gestor del puerto serie}
 Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, donde \texttt{QSerialPort} es la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase y ofrecer métodos que faciliten la integración con el gestor de protocolo. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
@@ -344,8 +344,8 @@ Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar
 
 \newpage
 
-\subsection{Diseño de la interfaz gráfica}
-Para el desarrollo de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece un módulo llamado \texttt{QtQuick Controls} que permite utilizar componentes estándar como botones, entradas de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes ofrecen un tema visual definido por el sistema operativo. Sin embargo, la documentación detalla cómo se pueden personalizar para ofrecer un aspecto más acorde a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
+\subsection{Implementación de la interfaz gráfica}
+Para la implementación de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece el módulo \texttt{QtQuick Controls}, que permite emplear componentes estándar como botones, campos de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes proveen un estilo visual definido por el sistema operativo. No obstante, la documentación también describe mecanismos de personalización que permiten adaptar su apariencia a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
 
 \begin{figure}[H]
 	\centering
@@ -495,7 +495,7 @@ En la figura \ref{fig:mrc-user-board} se observan las vistas superior e inferior
 
 \subsection{Diseño de la placa central}
 
-La placa central consiste de cinco bloques, que se ilustran en la figura \ref{fig:hw-blocks}.
+La placa central consiste en cinco bloques, que se ilustran en la figura \ref{fig:hw-blocks}.
 
 \begin{figure}[H]
 	\centering
@@ -504,7 +504,7 @@ La placa central consiste de cinco bloques, que se ilustran en la figura \ref{fi
 	\label{fig:hw-blocks}
 \end{figure}
 
-Para el diseño de la conexión USB y la etapa reguladora se tomó como referencia el esquemático del kit de desarrollo \cite{st:mb1137-schematic}. En la figura \ref{fig:circuit-usb} se muestra el conector USB con el SBLC6-2 como componente de protección contra descargas electrostáticas \cite{st:usblc6-2}. Por otro lado, se aseguró que la señal diferencial posea una impedancia característica de 90 $\Omega$, de acuerdo a lo especificado por el estándar USB 2.0 \cite{usb:2.0-spec}.
+Para el diseño de la conexión USB y la etapa reguladora se tomó como referencia el esquemático del kit de desarrollo \cite{st:mb1137-schematic}. En la figura \ref{fig:circuit-usb} se muestra el conector USB con el USBLC6-2 como componente de protección contra descargas electrostáticas \cite{st:usblc6-2}. Por otro lado, se aseguró que la señal diferencial posea una impedancia característica de 90 $\Omega$, de acuerdo a lo especificado por el estándar USB 2.0 \cite{usb:2.0-spec}.
 
 \begin{figure}[H]
 	\centering
@@ -522,12 +522,12 @@ En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se m
 	\label{fig:circuit-power}
 \end{figure}
 
-La conexión de las entradas MIDI y de la placa de usuario es directa con el microcontrolador, por lo que no se necesitan componentes adicionales. Por el contrario, la conexión con la placa de salidas posee un buffer cuya función es subir la tensión de las señales (de 3,3 V a 5 V) y adaptar impedancias. En la figura \ref{fig:circuit-out-connector} se muestra el circuito de esta etapa, basada en el 74HCS244 \cite{ti:sn74hcs244} como componente central.
+La conexión de las entradas MIDI y de la placa de usuario es directa con el microcontrolador, por lo que no se necesitan componentes adicionales. Por el contrario, la conexión con la placa de salidas posee un buffer cuya función es subir la tensión de las señales (de 3,3 V a 5 V) y adaptar impedancias. En la figura \ref{fig:circuit-out-connector} se muestra el circuito de esta etapa, basado en el 74HCS244 \cite{ti:sn74hcs244} como componente central.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\textwidth]{./Figures/circuit-out-connector.png}
-	\caption{Circuito del conector USB.}
+	\caption{Circuito de adaptación hacia la placa de salidas MIDI.}
 	\label{fig:circuit-out-connector}
 \end{figure}
 
@@ -537,9 +537,9 @@ Además de lo mencionado explícitamente, durante la etapa de diseño se agregar
 	\item Capacitores de desacople.
 	\item Pulsador de reset.
 	\item La interfaz de programación del microcontrolador.
-	\item Test points para todas las señales.
-	\item Pads para exponer una UART adicional, usada con fines de debugging.
-	\item Pads a pines no utilizados del microcontrolador, para facilitar futuras ampliaciones del hardware.
+	\item Puntos de prueba para todas las señales.
+	\item Pads para exponer una UART adicional, usada con fines de depuración.
+	\item Pads conectados a pines no utilizados del microcontrolador, para facilitar futuras ampliaciones del hardware.
 \end{itemize}
 
 En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior de la placa central.
@@ -569,7 +569,7 @@ En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior
 
 Las placas de circuito impreso fueron diseñadas con la intención de ser alojadas en un gabinete tipo rack de 19 pulgadas, ya que están estandarizados para equipamiento electrónico e informático. Estos gabinetes se dimensionan mediante unidades de rack (1 U equivale a 1,75 pulgadas). Se estableció como requerimiento usar un gabinete de 1 RU.
 
-Dado que son gabinetes estandarizados, se contactó con un productor, y se coordinó el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. En la figura \ref{fig:render} se muestra un render con el despiece de las placas, el gabinete y el panel frontal.
+Dado que son gabinetes estandarizados, se contactó a un proveedor para coordinar el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. En la figura \ref{fig:render} se muestra un render con el despiece de las placas, el gabinete y el panel frontal.
 
 \begin{figure}[H]
 	\centering

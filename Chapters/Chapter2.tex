@@ -55,13 +55,13 @@ Con base en lo expuesto, la diferencia entre un mensaje de canal y uno de sistem
 La siguiente jerarquía de categorización se lista únicamente a modo explicativo:
 \begin{itemize}
 	\item Channel voice messages: controlan las voces de un instrumento. Se entiende por voz el sonido que este genera.
-	\item Channel mode messages: determinan cómo debe ser la respuesta del instrumento frente a los Voice Messages.
-	\item System common messages: son mensajes de sistema generales que se aplican sobre todos los receptores.
-	\item System real time messages: son mensajes orientados a sincronizar instrumentos que disponen de algún mecanismo de reloj.
+	\item Channel mode messages: determinan cómo debe ser la respuesta del instrumento frente a los voice messages.
+	\item System common messages: son mensajes de generales de sistema que se aplican sobre todos los receptores.
+	\item System real time messages: orientados a sincronizar instrumentos que disponen de algún mecanismo de reloj.
 	\item System exclusive messages: son mensajes de longitud variable, pensados para que los fabricantes puedan transmitir información propietaria que no está contemplada en el estándar.
 \end{itemize}
 
-En la tabla \ref{tab:channel-messages} se listan todos los mensajes de canal definidos por el estándar. Además se agrega la cantidad de bytes de datos que posee cada uno de ellos.
+En la tabla \ref{tab:channel-messages} se listan todos los mensajes de canal definidos por el estándar. Además, se agrega la cantidad de bytes de datos que posee cada uno de ellos.
 \begin{table}[h]
 	\centering
 	\caption[Mensajes de canal.]{Mensajes de canal. El número de canal \texttt{n} se codifica en el nibble menos significativo del byte de estado.}
@@ -142,7 +142,7 @@ Para desarrollar el equipo, el requerimiento más importante del microcontrolado
 	\end{tabular}
 \end{table}
 
-Puede observarse que dispone de 10 interfaces UART, lo que cumple con los requerimientos del trabajo. Además, el microcontrolador posee 16 canales de DMA (\textit{Direct Memory Access}). Esto implica que las transferencias de los datos recibidos o a enviar no requieren intervención directa del procesador, lo que maximiza el rendimiento. Finalmente, también existe un periférico USB (\textit{Universal Serial Bus}), por lo que es viable establecer una comunicación con computadoras.
+Puede observarse que dispone de 10 interfaces UART, lo que cumple con los requerimientos del trabajo. Además, el microcontrolador posee 16 canales de DMA (\textit{Direct Memory Access}). Esto implica que las transferencias de los datos recibidos o a enviar no requieren intervención directa del procesador, lo que maximiza el rendimiento. Además, también existe un periférico USB (\textit{Universal Serial Bus}), por lo que es viable establecer una comunicación con computadoras.
 
 El fabricante comercializa un kit de desarrollo basado en este microcontrolador, llamado NUCLEO-F413ZH \cite{st:um1974}, que puede observarse en la figura \ref{fig:nucleo-f413}.
 
@@ -195,7 +195,7 @@ La utilización de esta biblioteca permitió incorporar una interfaz de comunica
 Como sistema operativo en tiempo real se utilizó FreeRTOS \cite{freertos:kernel}, un kernel ampliamente difundido en sistemas embebidos de recursos acotados. FreeRTOS proporciona mecanismos de planificación de tareas, colas de mensajes, semáforos y temporizadores de software, entre otros servicios básicos necesarios para estructurar aplicaciones concurrentes sobre microcontroladores.
 
 \subsection{Herramientas de testing}
-Se utilizó GoogleTest \cite{googletest} para implementar y correr los tests unitarios de los módulos desarrollados. Por otro lado, se utilizó Python 3.10 \cite{python} para automatizar las pruebas de latencia y procesar los resultados generados.
+Se utilizó GoogleTest \cite{googletest} para implementar y ejecutar los tests unitarios de los módulos desarrollados. Por otro lado, se recurrió a Python 3.10 \cite{python} para automatizar las pruebas de latencia y procesar los resultados generados.
 
 %----------------------------------------------------------------------------------------
 

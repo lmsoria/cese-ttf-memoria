@@ -28,7 +28,7 @@ Los equipos se comunican mediante el estándar MIDI (\textit{Musical Instrument 
 
 Para garantizar una correcta interoperabilidad, MIDI no solo define el protocolo (es decir, el formato de los mensajes), sino también la conexión física entre ellos mediante la especificación de los cables y conectores que deben usarse.
 
-En la especificación original, la MMA (\textit{MIDI Manufacturers Association}) adoptó el conector DIN de 5 pines a 180° como interfaz física estandarizada para interconectar equipos \cite{mma:midi_spec}. En la figura \ref{fig:din5} se muestra a modo de ejemplo, el panel trasero de un sintetizador, donde se observan dos conectores etiquetados como MIDI OUT y MIDI IN.
+En la especificación original, la MMA (\textit{MIDI Manufacturers Association}) adoptó el conector DIN de 5 pines a 180° como interfaz física estandarizada para interconectar equipos \cite{mma:midi_spec}. En la figura \ref{fig:din5} se muestra, a modo de ejemplo, el panel trasero de un sintetizador, donde se observan dos conectores etiquetados como MIDI OUT y MIDI IN.
 
 \begin{figure}[ht]
 	\centering
@@ -37,7 +37,7 @@ En la especificación original, la MMA (\textit{MIDI Manufacturers Association})
 	\label{fig:din5}
 \end{figure}
 
-A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar, también, menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain \cite{hass:midi_hardware}. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
+A partir de lo expuesto se infiere que la comunicación es unidireccional: se requiere de un conector de salida (MIDI OUT) para el envío de datos y otro de entrada (MIDI IN) para su recepción. El estándar también menciona un puerto adicional y opcional llamado MIDI THRU, que retransmite lo recibido en la entrada. Esto permite encadenar varios dispositivos entre sí, lo que se conoce como una topología en cadena o daisy chain \cite{hass:midi_hardware}. En la figura \ref{fig:daisy} se presenta un diagrama ilustrativo de este tipo de conexión.
 
 \begin{figure}[ht]
 	\centering
@@ -170,7 +170,7 @@ En consecuencia, se planteó el desafío de desarrollar una versión local de me
 	\item Permita configurar el direccionamiento entre entradas y salidas.
 \end{itemize}
 
-Finalmente, cabe destacar que pese a que la motivación de este trabajo fue personal, se realizaron encuestas en foros de entusiastas argentinos, con la intención de orientar el desarrollo de forma tal que el trabajo tenga potencial de venta en el futuro. Esto garantizaría poder cubrir un nicho que actualmente no está cubierto.
+Finalmente, cabe destacar que pese a que la motivación de este trabajo fue personal, se realizaron encuestas en foros de entusiastas argentinos, con la intención de orientar el desarrollo de forma tal que el trabajo tenga potencial de venta en el futuro. Esto permitiría responder a una necesidad actualmente no cubierta.
 
 %----------------------------------------------------------------------------------------
 

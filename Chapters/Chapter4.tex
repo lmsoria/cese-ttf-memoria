@@ -9,7 +9,7 @@ En este capítulo se presentan las pruebas realizadas para validar el funcionami
 
 \section{Compilación como herramienta de verificación} % 1 página
 
-En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje C++ en su estándar 20, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución (runtime) y se mejoró la confiabilidad general del sistema.
+En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje C++20, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución y se mejoró la confiabilidad general del sistema.
 
 Este enfoque resulta de interés en sistemas embebidos, donde las capacidades de depuración pueden ser limitadas y los errores detectados en campo pueden implicar costos elevados. En este contexto, el compilador actúa como un verificador estático que valida invariantes del diseño antes de que el firmware sea desplegado en el hardware objetivo.
 
@@ -29,9 +29,9 @@ Este paradigma de programación resultó en una primera línea de defensa frente
 
 \section{Pruebas unitarias del firmware} % 2 páginas
 
-Las pruebas unitarias del firmware se orientaron a verificar el comportamiento funcional de los componentes que forman parte directa del flujo de datos principal de la aplicación. Como se mencionó en \ref{subsection:io}, este flujo comprende la recepción de datos crudos desde las interfaces de entrada, su interpretación como mensajes MIDI, la aplicación de reglas de filtrado y, finalmente, el enrutamiento hacia las salidas correspondientes (figura \ref{fig:svc-in-pipe}).
+Las pruebas unitarias del firmware se orientaron a verificar el comportamiento funcional de los componentes que forman parte directa del flujo de datos principal de la aplicación. Como se mencionó en \ref{subsection:io}, este flujo comprende la recepción de datos crudos desde las interfaces de entrada, su interpretación como mensajes MIDI, la aplicación de reglas de filtrado y, finalmente, el enrutamiento hacia las salidas correspondientes como se muestra en la figura \ref{fig:svc-in-pipe}.
 
-En base a este criterio, se realizaron pruebas unitarias sobre los siguientes componentes:
+Con base en este criterio, se realizaron pruebas unitarias sobre los siguientes componentes:
 \begin{itemize}
 	\item \texttt{RingBuffer}
 	\item \texttt{app::Parser}
@@ -40,33 +40,32 @@ En base a este criterio, se realizaron pruebas unitarias sobre los siguientes co
 	\item \texttt{app::Serializer}
 \end{itemize}
 
-\subsection{Pruebas de \texttt{RingBuffer}}
+\subsection{Pruebas del buffer circular}
 La estructura \texttt{RingBuffer} se utiliza para el almacenamiento temporal dentro del flujo de datos del firmware.
 
 Las pruebas unitarias verificaron las propiedades fundamentales de una cola FIFO circular:
 \begin{itemize}
 	\item Estado inicial del buffer.
-	\item Operaciones de lectura y escritura sin wrap-around.
-	\item Operaciones de lectura y escritura con wrap-around.
+	\item Operaciones de lectura y escritura con y sin wrap-around.
 	\item Condiciones límite, como el llenado completo del buffer y el intento de escritura de datos mayor a su capacidad.
 \end{itemize}
 
-\subsection{Pruebas de \texttt{app::Parser}}
+\subsection{Pruebas del parser}
 La clase \texttt{app::Parser} se encarga de interpretar los datos crudos recibidos y convertirlos en mensajes MIDI estructurados.
 
 Las pruebas unitarias verificaron la correcta decodificación de mensajes MIDI, así como el descarte adecuado de bytes de datos aislados. Se evaluó el manejo de secuencias inválidas y la capacidad del parser de reanudar el procesamiento ante la aparición de nuevos bytes de estado. Además, se validó el tratamiento de mensajes incompletos distribuidos en múltiples bloques de entrada.
 
-\subsection{Pruebas de \texttt{app::Filter}}
+\subsection{Pruebas del filtro de mensajes}
 La responsabilidad de \texttt{app::Filter} es la de implementar las reglas de filtrado configurables que determinan qué mensajes MIDI continúan su procesamiento dentro del flujo de datos.
 
-Las pruebas unitarias validaron el comportamiento por defecto del filtro, en el que todos los mensajes sean aceptados en ausencia de reglas específicas. Posteriormente, se verificó la correcta aplicación de reglas de filtrado parametrizadas por tipo de mensaje y canal. Asimismo, se comprobó la independencia entre los filtros de mensajes de canal y sistema, para verificar que el bloqueo de un mensaje no afecte a otros no relacionados.
+Las pruebas unitarias validaron el comportamiento por defecto del filtro, en el que todos los mensajes son aceptados en ausencia de reglas específicas. Posteriormente, se verificó la correcta aplicación de reglas de filtrado parametrizadas por tipo de mensaje y canal. Asimismo, se comprobó la independencia entre los filtros de mensajes de canal y sistema, para verificar que el bloqueo de un mensaje no afecte a otros no relacionados.
 
-\subsection{Pruebas de \texttt{app::Router}}
+\subsection{Pruebas del router de mensajes}
 El componente \texttt{app::Router} es responsable del enrutamiento de los mensajes MIDI hacia las salidas configuradas.
 
 Las pruebas unitarias se enfocaron en validar el estado inicial sin rutas habilitadas, la activación selectiva de salidas individuales y la coexistencia de múltiples rutas dentro de un mismo conjunto de configuración. Además, se verificó la independencia entre distintos conjuntos de rutas, de modo que las modificaciones en uno de ellos no impacten sobre los demás.
 
-\subsection{Pruebas de \texttt{app::Serializer}}
+\subsection{Pruebas del serializador}
 La clase \texttt{app::Serializer} constituye la etapa final del flujo de datos del firmware y se encarga de convertir los mensajes MIDI estructurados en una secuencia de bytes apta para su transmisión.
 
 Las pruebas unitarias verificaron la correcta serialización de los distintos tipos de mensajes MIDI, de forma tal que la secuencia de bytes generada respete el formato definido por la especificación del protocolo. Asimismo, se comprobó la preservación de la información original de estado, canal y datos.
@@ -76,18 +75,11 @@ Las pruebas unitarias verificaron la correcta serialización de los distintos ti
 %----------------------------------------------------------------------------------------
 
 \section{Pruebas de comunicación entre software y firmware} % 2 páginas
-Antes de comenzar el desarrollo de la aplicación gráfica se requería verificar el funcionamiento del equipo, que es controlado mediante comandos serializados. Para lograr este fin, se desarrolló una aplicación en Qt de uso interno que permite enviar por puerto serie todos los comandos definidos por el protocolo. En la figura \ref{fig:test-proto} se muestra una captura de pantalla de la aplicación.
+Antes de comenzar el desarrollo de la aplicación gráfica se requería verificar el funcionamiento del equipo, que es controlado mediante comandos serializados. Para lograr este fin, se desarrolló una aplicación en Qt de uso interno que permite enviar por puerto serie todos los comandos definidos por el protocolo.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\textwidth]{./Figures/test-proto.png}
-	\caption{Software desarrollado para probar el protocolo entre la computadora y el equipo.}
-	\label{fig:test-proto}
-\end{figure}
+El software lista todos los comandos agrupados por funcionalidad. Aquellos comandos que envían información adicional poseen los widgets necesarios para poder modificar los parámetros. Por otro lado, se creó un componente que visualiza la estructura \texttt{app::Settings} de la figura \ref{fig:app-settings} como un árbol. Esto facilita inspeccionar el estado del router y depurar comportamientos no deseados.
 
-El software lista todos los comandos agrupados por funcionalidad. Aquellos comandos que envían información adicional poseen los widgets necesarios para poder modificar los parámetros. Por otro lado, se creó un componente que visualiza la estructura \texttt{app::Settings} (figura \ref{fig:app-settings}) como un árbol. Esto facilita inspeccionar el estado del router y depurar comportamientos no deseados.
-
-Si bien esta herramienta de prueba es manual, facilitó el desarrollo y validación del equipo en una etapa temprana de la ejecución del trabajo, sin la necesidad de tener la aplicación de escritorio desarrollada y con una interfaz gráfica definida.
+Si bien esta herramienta de prueba fue de uso manual, resultó útil para validar el funcionamiento del protocolo de comunicación en una etapa temprana del proyecto. En particular, permitió verificar el envío de comandos, la recepción de respuestas y la correcta modificación e inspección de la configuración interna del equipo, sin depender aún de la aplicación de escritorio definitiva.
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -107,13 +99,13 @@ Para poder realizar las mediciones de latencia se montó un banco de pruebas que
 	\label{fig:test-bench-db}
 \end{figure}
 
-El procedimiento de prueba consiste en tomar el DUT (\textit{Device Under Test}) e inyectarle mensajes MIDI. Para lograr este fin, se omitió la placa de entradas y se conectaron conectores USB-Serie de manera directa. Con ayuda de un analizador lógico, se conectaron sondas en las entradas y salidas de la placa y se midió el tiempo de retardo.
+El procedimiento de prueba consiste en inyectar mensajes MIDI al DUT (\textit{Device Under Test}). Para ello, no se utilizó la placa de entradas y se conectaron conversores USB-Serie de manera directa a la placa central. Con ayuda de un analizador lógico, se conectaron sondas en las entradas y salidas de la placa y se midió el tiempo de retardo.
 
-Adicionalmente, se conectaron un programador y un conversor USB-Serie extra para realizar cambios de firmware y monitorear mensajes de debug emitidos por la placa, respectivamente. En la figura \ref{fig:test-bench} se observa el banco de pruebas montado.
+Adicionalmente, se conectaron un programador y un conversor USB-Serie adicional para actualizar el firmware y monitorear mensajes de depuración emitidos por la placa, respectivamente. En la figura \ref{fig:test-bench} se observa el banco de pruebas montado.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/test-bench.jpg}
+	\includegraphics[width=0.7\textwidth]{./Figures/test-bench.jpg}
 	\caption{Fotografía del banco de pruebas montado.}
 	\label{fig:test-bench}
 \end{figure}
@@ -135,9 +127,9 @@ La inyección de mensajes y su captura en el analizador lógico fueron automatiz
 	\item Todas las entradas ruteadas a una salida (4$\rightarrow$1).
 \end{itemize}
 
-\subsection{Ensayo 1 $\rightarrow$ 8}
+\subsection{Ensayo del ruteo de una entrada a ocho salidas}
 \label{ensayo-1-8}
-El objetivo de este ensayo consiste en cuantificar el impacto del proceso de replicación y serialización de mensajes sobre la latencia del sistema. Con este fin, se inyectó un mensaje de tipo Note On cada 5 ms en la entrada 1, el cual fue ruteado hacia la totalidad de las salidas. En la figura \ref{fig:test-latency-1-8} se presenta una captura del analizador lógico utilizada para ilustrar el comportamiento observado.
+El objetivo de este ensayo consiste en cuantificar el impacto del proceso de replicación y serialización de mensajes sobre la latencia del sistema. Con este fin, se inyectó un mensaje de tipo Note On cada 5 ms en la entrada \#1, que estuvo routeada hacia la totalidad de las salidas. En la figura \ref{fig:test-latency-1-8} se presenta una captura del analizador lógico utilizada para ilustrar el comportamiento observado.
 
 \begin{figure}[H]
 	\centering
@@ -146,7 +138,7 @@ El objetivo de este ensayo consiste en cuantificar el impacto del proceso de rep
 	\label{fig:test-latency-1-8}
 \end{figure}
 
-La captura evidencia que el mensaje recibido en la entrada 1 es replicado en todas las salidas con un desfasaje entre 1,5 ms y 2 ms. Para obtener métricas más precisas, se desarrolló un script automatizado encargado de la adquisición de 10 000 eventos en la entrada y de la detección de los eventos correspondientes en cada salida. Sobre esta base, se calculó la latencia individual de cada evento y se realizó un análisis estadístico de los resultados, con el objetivo de caracterizar el desempeño temporal del equipo. Estos resultados se encuentran agrupados en la tabla \ref{tab:test-latency-1-8-stats}. La fila Global corresponde al conjunto de todas las mediciones realizadas.
+La captura evidencia que el mensaje recibido en la entrada \#1 es replicado en todas las salidas con un desfasaje entre 1,5 ms y 2 ms. Para obtener métricas más precisas, se desarrolló un script automatizado encargado de la adquisición de diez mil eventos en la entrada y de la detección de los eventos correspondientes en cada salida. Sobre esta base, se calculó la latencia individual de cada evento y se realizó un análisis estadístico de los resultados, con el objetivo de caracterizar el desempeño temporal del equipo. Estos resultados se encuentran agrupados en la tabla \ref{tab:test-latency-1-8-stats}. La fila ``Global'' corresponde al conjunto de todas las mediciones realizadas.
 
 \begin{table}[H]
 	\centering
@@ -154,7 +146,7 @@ La captura evidencia que el mensaje recibido en la entrada 1 es replicado en tod
 	{Estadísticas de latencias para el caso $1 \rightarrow 8$.}
 	\label{tab:test-latency-1-8-stats}
 
-	\resizebox{0.6\textwidth}{!}{%
+	\resizebox{0.8\textwidth}{!}{%
 		\begin{tabular}{ccccc}
 			\toprule
 			\textbf{Salida} & \textbf{Mínimo {[}$\mu s${]}} & \textbf{Media {[}$\mu s${]}} & \textbf{Máximo {[}$\mu s${]}} & \textbf{Desviación {[}$\mu s${]}} \\
@@ -172,11 +164,11 @@ La captura evidencia que el mensaje recibido en la entrada 1 es replicado en tod
 	\end{tabular}}
 \end{table}
 
-En el escenario evaluado, la latencia global cumple con el requerimiento establecido de 10 ms, registrándose un valor medio de 1,6 ms y un valor máximo de 1,8 ms.
+En la figura \ref{fig:test_1-8_hist} se observa el histograma de latencia global. En el escenario evaluado, se cumple con el requerimiento establecido de ser menor a 10 ms, registrándose un valor medio de 1,6 ms y un valor máximo de 1,8 ms.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/test_1-8_hist.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/test_1-8_hist.png}
 	\caption{Histograma de latencia para el caso 1$\rightarrow$8.}
 	\label{fig:test_1-8_hist}
 \end{figure}
@@ -190,16 +182,16 @@ Para analizar el comportamiento por salida se construyó un diagrama de caja, qu
 	\label{fig:test_1-8_boxplot}
 \end{figure}
 
-Esta representación permite comparar de manera visual la dispersión y el desfasaje temporal introducidos por el proceso de ruteo. La propagación de los mensajes evidencia un barrido temporal entre salidas, en el cual la salida 1 presenta precedencia respecto de las restantes, que se ordenan de manera creciente. La caracterización de este desfasaje resulta relevante, dado que en un contexto de ejecución musical los eventos deben dispararse de la forma más simultánea posible. En la figura \ref{fig:test_1_8_skew} se presenta un histograma del desfasaje entre salidas, donde se observa que este no supera los 300 $\mu$s.
+Esta representación permite comparar de manera visual la dispersión y el desfasaje temporal introducidos por el proceso de ruteo. La propagación de los mensajes evidencia un barrido temporal entre salidas, en donde la salida \#1 presenta precedencia respecto de las restantes, que se ordenan de manera creciente. La caracterización de este desfasaje resulta relevante, dado que en un contexto de ejecución musical los eventos deben dispararse de la forma más simultánea posible. En la figura \ref{fig:test_1_8_skew} se presenta un histograma del desfasaje entre salidas, donde se observa que este no supera los 300 $\mu$s.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/test_1_8_skew.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/test_1_8_skew.png}
 	\caption{Histograma del desfasaje entre salidas para el caso 1$\rightarrow$8.}
 	\label{fig:test_1_8_skew}
 \end{figure}
 
-\subsection{Ensayo 4 $\rightarrow$ 4}
+\subsection{Ensayo del ruteo de cada entrada a una salida distinta}
 \label{ensayo-4-4}
 
 El objetivo de este ensayo es caracterizar la latencia del sistema cuando múltiples rutas independientes operan de forma concurrente, sin replicación ni mezcla de mensajes. Para ello, se inyectaron mensajes Note On en las cuatro entradas y se configuró el ruteo con una correspondencia uno a uno entre entradas y salidas. La figura \ref{fig:test-latency-4-4} presenta una captura del analizador lógico correspondiente a este escenario.
@@ -214,12 +206,12 @@ El objetivo de este ensayo es caracterizar la latencia del sistema cuando múlti
 
 De manera análoga al ensayo de la subsección \ref{ensayo-1-8}, se desarrolló un script para automatizar la adquisición de datos y su procesamiento estadístico. La tabla \ref{tab:test-latency-4-4-stats} resume los resultados por salida y para el conjunto total de mediciones.
 
-\begin{table}[]
+\begin{table}[H]
 	\centering
 	\caption[Estadísticas de latencias para el caso $4 \rightarrow 4$]
 	{Estadísticas de latencias para el caso $4 \rightarrow 4$.}
 	\label{tab:test-latency-4-4-stats}
-	\resizebox{0.7\textwidth}{!}{%
+	\resizebox{0.8\textwidth}{!}{%
 		\begin{tabular}{ccccc}
 			\toprule
 			\textbf{Salida} & \textbf{Mínimo {[}$\mu s${]}} & \textbf{Media {[}$\mu s${]}} & \textbf{Máximo {[}$\mu s${]}} & \textbf{Desviación {[}$\mu s${]}} \\
@@ -238,7 +230,7 @@ Los resultados indican una latencia media global de 2 ms, con dispersión acotad
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/test_4-4_hist.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/test_4-4_hist.png}
 	\caption{Histograma de latencia para el caso 4$\rightarrow$4.}
 	\label{fig:test_4-4_hist}
 \end{figure}
@@ -252,10 +244,10 @@ Los resultados indican una latencia media global de 2 ms, con dispersión acotad
 
 Este comportamiento sugiere que la ejecución concurrente de rutas independientes no introduce incrementos apreciables de latencia ni evidencia interferencias temporales entre entradas y salidas.
 
-\subsection{Ensayo 4 $\rightarrow$ 1}
+\subsection{Ensayo del ruteo de todas las entradas a una salida}
 \label{ensayo-4-1}
 
-Este ensayo caracteriza la latencia del sistema cuando cuatro entradas comparten una única salida. Se inyectaron mensajes Note On en las cuatro entradas, ruteadas hacia la salida 1. La figura \ref{fig:test-latency-4-1} muestra una captura del analizador lógico que ilustra el comportamiento observado.
+Este ensayo caracteriza la latencia del sistema cuando todas las entradas comparten una única salida. Se inyectaron mensajes Note On en las cuatro entradas, ruteadas hacia la salida \#1. La figura \ref{fig:test-latency-4-1} muestra una captura del analizador lógico que ilustra el comportamiento observado.
 
 \begin{figure}[H]
 	\centering
@@ -271,7 +263,7 @@ Dado que múltiples entradas compiten por el mismo recurso de transmisión, se e
 	\caption[Estadísticas de latencias para el caso $4 \rightarrow 1$]
 	{Estadísticas de latencias para el caso $4 \rightarrow 1$.}
 	\label{tab:test-latency-4-1-stats}
-	\resizebox{0.7\textwidth}{!}{%
+	\resizebox{0.8\textwidth}{!}{%
 		\begin{tabular}{ccccc}
 			\toprule
 			\textbf{Entrada} & \textbf{Mínimo {[}$\mu s${]}} & \textbf{Media {[}$\mu s${]}} & \textbf{Máximo {[}$\mu s${]}} & \textbf{Desviación {[}$\mu s${]}} \\
@@ -289,7 +281,7 @@ La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del um
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/test_4-1_hist.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/test_4-1_hist.png}
 	\caption{Histograma de latencia para el caso 4$\rightarrow$1.}
 	\label{fig:test_4-1_hist}
 \end{figure}
