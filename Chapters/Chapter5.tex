@@ -23,7 +23,7 @@ Los principales resultados del trabajo pueden resumirse en los siguientes puntos
 
 	\item Desde el punto de vista temporal, el equipo presentó una respuesta adecuada para la aplicación prevista. En todos los casos analizados, la latencia permaneció por debajo del criterio de aceptación adoptado, incluso en el escenario más exigente.
 
-	\item Algunos aspectos previstos en la planificación original no se completaron en esta etapa y quedaron planteados como líneas de trabajo futuro. Asimismo, el desarrollo demandó un plazo de ejecución mayor al previsto originalmente. No obstante, estas cuestiones no invalidan el resultado principal alcanzado ni el cumplimiento de los objetivos técnicos centrales del proyecto.
+	\item Algunos aspectos previstos en la planificación original no se completaron en esta etapa y quedaron planteados como líneas de trabajo futuro. Asimismo, el desarrollo demandó un plazo de ejecución mayor al previsto originalmente. No obstante, estas cuestiones no invalidan el resultado principal alcanzado ni el cumplimiento de los objetivos técnicos centrales del trabajo.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ Los principales resultados del trabajo pueden resumirse en los siguientes puntos
 
 Para avanzar desde el prototipo actual hacia una versión más madura y comercializable del sistema, se identificaron los siguientes puntos de mejora:
 \begin{itemize}
-	\item Incorporar la exposición de las entradas y salidas MIDI a través del puerto USB, para habilitar el control desde la computadora y hacia la computadora.
+	\item Incorporar la exposición de las entradas y salidas MIDI a través del puerto USB, para habilitar el control bidireccional con la computadora.
 	\item Automatizar el proceso de compilación y testing a través de un pipeline de CI/CD (\textit{Continuous Integration/Continuous Deployment}), para poder ofrecer un mecanismo de versionado y trazabilidad más estructurado.
 	\item Reducir copias de memoria en la propagación de mensajes, ya que el despacho actual utiliza múltiples colas con duplicación de bytes.
 	\item Dado que la alimentación es por el puerto USB, incorporar un mecanismo de almacenamiento de energía y detección de desconexión para guardar cambios no aplicados y restablecer la configuración cuando se reinicie el equipo.

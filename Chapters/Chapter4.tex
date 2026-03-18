@@ -9,7 +9,7 @@ En este capítulo se presentan las pruebas realizadas para validar el funcionami
 
 \section{Compilación como herramienta de verificación} % 1 página
 
-En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje C++20, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución y se mejoró la confiabilidad general del sistema.
+En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje \texttt{C++20}, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución y se mejoró la confiabilidad general del sistema.
 
 Este enfoque resulta de interés en sistemas embebidos, donde las capacidades de depuración pueden ser limitadas y los errores detectados en campo pueden implicar costos elevados. En este contexto, el compilador actúa como un verificador estático que valida invariantes del diseño antes de que el firmware sea desplegado en el hardware objetivo.
 
@@ -79,14 +79,14 @@ Antes de comenzar el desarrollo de la aplicación gráfica se requería verifica
 
 El software lista todos los comandos agrupados por funcionalidad. Aquellos comandos que envían información adicional poseen los widgets necesarios para poder modificar los parámetros. Por otro lado, se creó un componente que visualiza la estructura \texttt{app::Settings} de la figura \ref{fig:app-settings} como un árbol. Esto facilita inspeccionar el estado del router y depurar comportamientos no deseados.
 
-Si bien esta herramienta de prueba fue de uso manual, resultó útil para validar el funcionamiento del protocolo de comunicación en una etapa temprana del proyecto. En particular, permitió verificar el envío de comandos, la recepción de respuestas y la correcta modificación e inspección de la configuración interna del equipo, sin depender aún de la aplicación de escritorio definitiva.
+Si bien esta herramienta de prueba fue de uso manual, resultó útil para validar el funcionamiento del protocolo de comunicación en una etapa temprana del trabajo. En particular, permitió verificar el envío de comandos, la recepción de respuestas y la correcta modificación e inspección de la configuración interna del equipo, sin depender aún de la aplicación de escritorio definitiva.
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
 
 \section{Pruebas de latencia} % 6 páginas
 
-Dado que la función del equipo es direccionar mensajes desde las entradas hacia las salidas, es fundamental que el tiempo de propagación sea el menor posible. Por otro lado, al tratarse de un contexto de ejecución musical, cualquier retardo significativo puede acarrear efectos indeseados en términos de responsividad. En \cite{wessel2002intimate} se menciona un límite de 10 ms de latencia a partir del cual se compromete la sensación de inmediatez y control musical en sistemas interactivos. Este tiempo fue adoptado como criterio de aceptación dura para validar los ensayos de latencia del equipo.
+Dado que la función del equipo es direccionar mensajes desde las entradas hacia las salidas, es fundamental que el tiempo de propagación sea el menor posible. Por otro lado, al tratarse de un contexto de ejecución musical, cualquier retardo significativo puede acarrear efectos indeseados en términos de responsividad. En \cite{wessel2002intimate} se menciona un límite de 10 ms de latencia a partir del que se compromete la sensación de inmediatez y control musical en sistemas interactivos. Este tiempo fue adoptado como criterio de aceptación dura para validar los ensayos de latencia del equipo.
 
 \subsection{Descripción del banco de pruebas}
 

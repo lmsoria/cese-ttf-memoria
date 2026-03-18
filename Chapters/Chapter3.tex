@@ -43,7 +43,7 @@ En este capítulo se detalla el proceso de desarrollo del equipo. Se describen l
 
 %----------------------------------------------------------------------------------------
 
-\section{Diagrama en bloques del sistema} \label{diagrama-bloques-sistema}
+\section{Arquitectura general del sistema} \label{diagrama-bloques-sistema}
 El trabajo desarrollado consiste en dos grandes bloques. Por un lado, se encuentra el firmware, que se ejecuta en la plataforma de hardware; por otro, el software que se ejecuta nativamente en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
 
 \begin{figure}[ht]
@@ -96,8 +96,8 @@ A continuación, se detalla la funcionalidad de cada una de ellas:
 	\item \texttt{Hardware}: no es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
 	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se incluye también la biblioteca USB desarrollada por ST.
 	\item \texttt{freeRTOS}: es la biblioteca de FreeRTOS, desarrollada por terceros \cite{freertos:rtos-book}.
-	\item \texttt{os}: es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
-	\item \texttt{hal}: es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
+	\item \texttt{os}: es un wrapper en \texttt{C++} de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
+	\item \texttt{hal}: es un wrapper en \texttt{C++} de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
 	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, relacionadas con los requerimientos de la aplicación.
 	\item \texttt{app}: capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
 \end{itemize}
@@ -137,11 +137,11 @@ En la figura \ref{fig:svc-dial} se ilustra un diagrama en bloques del servicio. 
 
 Cuando se detecta alguna actividad por parte del usuario, los siguientes eventos son enviados a la aplicación principal:
 \begin{itemize}
-	\item \texttt{ButtonPressed}: se detectó una pulsación simple.
-	\item \texttt{ButtonDoublePressed}: se detectó una pulsación doble dentro de una ventana temporal configurable.
-	\item \texttt{ButtonLongPressed}: se detectó una pulsación prolongada, con duración superior al umbral configurado.
-	\item \texttt{DialCW}: se detectó un giro en sentido horario.
-	\item \texttt{DialCCW}: se detectó un giro en sentido antihorario.
+	\item \texttt{ButtonPressed}: indica una pulsación simple.
+	\item \texttt{ButtonDoublePressed}: corresponde a una pulsación doble dentro de una ventana temporal configurable.
+	\item \texttt{ButtonLongPressed}: representa una pulsación prolongada, de duración superior al umbral configurado.
+	\item \texttt{DialCW}: se emite cuando el encoder gira en sentido horario.
+	\item \texttt{DialCCW}: se emite cuando el encoder gira en sentido antihorario.
 \end{itemize}
 
 \subsection{Diseño del servicio de LEDs}
