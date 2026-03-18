@@ -152,8 +152,8 @@
 %	DEFINE CUSTOM THESIS INFORMATION COMMANDS
 %----------------------------------------------------------------------------------------
 
-\def\authorname{}
-\def\ttitle{}
+\def\authorname{Leandro Soria}
+\def\ttitle{Desarrollo de un Router MIDI configurable}
 \newcommand*{\director}[1]{\def\dirname{#1}}
 \newcommand*{\codirector}[1]{\def\codirname{#1}}
 \newcommand*{\thesistitle}[1]{\def\@title{#1}\def\ttitle{#1}}
