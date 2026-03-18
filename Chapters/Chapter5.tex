@@ -5,7 +5,6 @@
 \label{Chapter5}
 En el presente capítulo se exponen las conclusiones más relevantes del trabajo realizado junto con los próximos pasos a seguir.
 
-
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -14,32 +13,31 @@ En el presente capítulo se exponen las conclusiones más relevantes del trabajo
 
 \section{Conclusiones generales}
 
-Este trabajo culminó con la realización de un prototipo de un router MIDI funcional que cumplió con la mayoría de los requerimientos establecidos en el plan de proyecto. El proceso abarcó múltiples etapas, desde la fase de diseño hasta el montaje mecánico del equipo. Su ejecución fue llevada a cabo mediante una planificación previa, basada en herramientas de gestión de proyectos.
+El trabajo permitió obtener un prototipo funcional de un router MIDI de cuatro entradas y ocho salidas, con ruteo y filtrado configurables. El desarrollo incluyó el firmware embebido, la aplicación de escritorio para configuración, las placas electrónicas y el montaje mecánico en un gabinete. Como resultado, se obtuvo un sistema completo y operativo.
 
-Dado el planteo del equipo como un producto potencial, se aplicaron conocimientos de áreas que exceden la electrónica y la programación de sistemas embebidos. A continuación se enumeran los principales aportes:
-
+Los principales resultados del trabajo pueden resumirse en los siguientes puntos:
 \begin{itemize}
-	\item Se aplicaron técnicas modernas de desarrollo de firmware y software mediante C++20, lo que favoreció mayor robustez y menor propensión a errores en tiempo de ejecución.
-	\item Se aplicaron conceptos de ingeniería de software, tales como patrones de diseño, arquitectura y casos de uso, para delimitar responsabilidades entre módulos y orientar su verificación.
-	\item Se aplicaron conceptos de sistemas operativos de tiempo real para estructurar una aplicación concurrente de firmware, capaz de despachar mensajes entre entradas y salidas de forma predecible.
-	\item Se aplicaron herramientas de testing para verificar distintos aspectos de la aplicación, que fueron desde la funcionalidad de bloques aislados (testing unitario), hasta la medición automatizada de la performance del equipo.
-	\item Se consideraron criterios de diseño para manufactura durante el desarrollo de las placas de circuito impreso.
-	\item Se aprendieron conceptos relacionados con UX/UI para desarrollar un software que resulte de uso intuitivo para público no especializado.
-\end{itemize}
+	\item Se cumplieron los requerimientos funcionales principales planteados para el sistema. En particular, se implementó la cantidad prevista de entradas y salidas, el almacenamiento de presets y la configuración del comportamiento del equipo mediante ruteo y filtrado de mensajes.
 
-De esta forma, el prototipo desarrollado cumple con las necesidades del autor, y al mismo tiempo posee potencial para ser introducido al mercado local.
+	\item El prototipo mostró un funcionamiento satisfactorio en la práctica. Los ensayos realizados permitieron verificar la operación general del sistema y validar su desempeño en distintos escenarios de uso.
+
+	\item Desde el punto de vista temporal, el equipo presentó una respuesta adecuada para la aplicación prevista. En todos los casos analizados, la latencia permaneció por debajo del criterio de aceptación adoptado, incluso en el escenario más exigente.
+
+	\item Algunos aspectos previstos en la planificación original no se completaron en esta etapa y quedaron planteados como líneas de trabajo futuro. Asimismo, el desarrollo demandó un plazo de ejecución mayor al previsto originalmente. No obstante, estas cuestiones no invalidan el resultado principal alcanzado ni el cumplimiento de los objetivos técnicos centrales del proyecto.
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 %	SECTION 2
 %----------------------------------------------------------------------------------------
+
 \section{Próximos pasos}
 
-Para poder convertir el prototipo diseñado en un producto comercializable, se identificaron los siguientes puntos de mejora:
+Para avanzar desde el prototipo actual hacia una versión más madura y comercializable del sistema, se identificaron los siguientes puntos de mejora:
 \begin{itemize}
 	\item Incorporar la exposición de las entradas y salidas MIDI a través del puerto USB, para habilitar el control desde la computadora y hacia la computadora.
 	\item Automatizar el proceso de compilación y testing a través de un pipeline de CI/CD (\textit{Continuous Integration/Continuous Deployment}), para poder ofrecer un mecanismo de versionado y trazabilidad más estructurado.
 	\item Reducir copias de memoria en la propagación de mensajes, ya que el despacho actual utiliza múltiples colas con duplicación de bytes.
-	\item Dado que la alimentación es por el puerto USB, incorporar un mecanismo de almacenamiento de energía y detección de desconexión para guardar cambios no aplicados y reestablecer la configuración cuando se reinicie el equipo.
+	\item Dado que la alimentación es por el puerto USB, incorporar un mecanismo de almacenamiento de energía y detección de desconexión para guardar cambios no aplicados y restablecer la configuración cuando se reinicie el equipo.
 	\item Evaluar el uso de una variante de 100 pines del microcontrolador, con el objetivo de reducir costo y área de circuito impreso.
 	\item Eliminar componentes prescindibles para la versión final del producto.
 	\item Refinar la experiencia de uso de la aplicación de escritorio, y agregar la posibilidad de actualizar el firmware desde la misma.
