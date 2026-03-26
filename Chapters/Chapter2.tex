@@ -122,7 +122,7 @@ Finalmente, en la tabla \ref{tab:system-messages} se listan los mensajes de sist
 En esta sección se describen los elementos de hardware empleados durante el desarrollo inicial del equipo.
 
 \subsection{Microcontrolador y kit de desarrollo}
-Para desarrollar el equipo, el requerimiento más importante del microcontrolador es que disponga de suficientes puertos serie, también denominados UART (\textit{Universal Asynchronous Receiver-Transmitter}). Para la elaboración de este trabajo se seleccionó el microcontrolador STM32F413ZH de la firma STMicroelectronics. Sus principales características se listan en la tabla \ref{tab:stm32f413zh-traits} \cite{st:stm32f413-ds}.
+Para desarrollar el equipo, el requerimiento más importante del microcontrolador es que disponga de suficientes puertos serie físicos, también denominados UART (\textit{Universal Asynchronous Receiver-Transmitter}). Para la elaboración de este trabajo se seleccionó el microcontrolador STM32F413ZH de la firma STMicroelectronics. Sus principales características se listan en la tabla \ref{tab:stm32f413zh-traits} \cite{st:stm32f413-ds}.
 
 \begin{table}[h]
 	\centering
@@ -169,7 +169,7 @@ Dado que MIDI es un estándar basado en comunicación serie, para la etapa inici
 En esta sección se describen las principales herramientas de software y bibliotecas de terceros empleadas para el desarrollo del firmware del equipo.
 
 \subsection{Toolchain utilizado}
-Se optó por utilizar el lenguaje \texttt{C++20} \cite{ISO:14882-2020} para el desarrollo de la aplicación principal, mientras que las bibliotecas de terceros están desarrolladas en el lenguaje de programación C \cite{st:um1725}, \cite{freertos:c-dev-tools}. Para ambos casos se empleó ARM GNU Toolchain, versión 14.3, como herramienta de compilación cruzada para la arquitectura ARM.
+Se optó por utilizar el lenguaje C++20 \cite{ISO:14882-2020} para el desarrollo de la aplicación principal, mientras que las bibliotecas de terceros están desarrolladas en el lenguaje de programación C \cite{st:um1725}, \cite{freertos:c-dev-tools}. Para ambos casos se empleó ARM GNU Toolchain, versión 14.3, como herramienta de compilación cruzada para la arquitectura ARM.
 
 \subsection{Biblioteca HAL}
 
@@ -196,9 +196,9 @@ Se utilizó GoogleTest \cite{googletest} para implementar y ejecutar los tests u
 
 \section{Framework para el desarrollo del software}
 
-Para el desarrollo de la aplicación de escritorio se empleó Qt 6 \cite{qt:qt6} como framework principal. Qt provee un conjunto de bibliotecas en \texttt{C++} orientadas al desarrollo de interfaces gráficas y aplicaciones multiplataforma, lo que facilita la ejecución de un mismo código en distintos sistemas operativos de escritorio sin cambios significativos.
+Para el desarrollo de la aplicación de escritorio se empleó Qt 6 \cite{qt:qt6} como framework principal. Qt provee un conjunto de bibliotecas en C++ orientadas al desarrollo de interfaces gráficas y aplicaciones multiplataforma, lo que facilita la ejecución de un mismo código en distintos sistemas operativos de escritorio sin cambios significativos.
 
-La interfaz de usuario se implementó mediante QML (\textit{Qt Modeling Language}) \cite{qt:qml}, un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en \texttt{C++}, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, lo que simplifica el mantenimiento y la evolución futura de la aplicación.
+La interfaz de usuario se implementó mediante QML (\textit{Qt Modeling Language}) \cite{qt:qml}, un lenguaje declarativo que permite describir la estructura visual y el comportamiento de la interfaz de manera compacta. La lógica de aplicación y la comunicación con el equipo se implementaron en C++, integrándose con QML a través de mecanismos provistos por Qt. Esta combinación permitió separar de forma clara la presentación gráfica de la lógica de negocio, lo que simplifica el mantenimiento y la evolución futura de la aplicación.
 
 %----------------------------------------------------------------------------------------
 

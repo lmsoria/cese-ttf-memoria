@@ -44,7 +44,7 @@ En este capítulo se detalla el proceso de desarrollo del equipo. Se describen l
 %----------------------------------------------------------------------------------------
 
 \section{Arquitectura general del sistema} \label{diagrama-bloques-sistema}
-El trabajo desarrollado consiste en dos grandes bloques. Por un lado, se encuentra el firmware, que se ejecuta en la plataforma de hardware; por otro, el software que se ejecuta nativamente en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
+El trabajo desarrollado consiste en dos grandes bloques. Por un lado, se encuentra el firmware, que se opera en la plataforma de hardware; por otro, el software de escritorio, que corre en una computadora y se comunica con el firmware. En la figura \ref{fig:sys-arch} se ilustra un diagrama en bloques de la solución implementada.
 
 \begin{figure}[ht]
 	\centering
@@ -53,7 +53,7 @@ El trabajo desarrollado consiste en dos grandes bloques. Por un lado, se encuent
 	\label{fig:sys-arch}
 \end{figure}
 
-El firmware se encarga de realizar íntegramente el procesamiento del flujo de datos (mensajes MIDI), mientras que el software actúa como interfaz de configuración del comportamiento del equipo. La comunicación entre ambas es mediante un puerto serie virtual, emulado por la interfaz USB del microcontrolador. A través de una serie de comandos, se modifican las propiedades de una estructura que modela el comportamiento de la aplicación (\texttt{Settings}). En la figura \ref{fig:app-settings} se muestra un diagrama de clases que incluye todas las estructuras que componen este modelo.
+El firmware se encarga de realizar íntegramente el procesamiento del flujo de datos (mensajes MIDI), mientras que el software actúa como interfaz de configuración del comportamiento del equipo. La comunicación entre ambas se realiza mediante un puerto serie virtual, emulado por la interfaz USB del microcontrolador. A través de una serie de comandos, se modifican las propiedades de una estructura que modela el comportamiento de la aplicación (\texttt{Settings}). En la figura \ref{fig:app-settings} se muestra un diagrama de clases que incluye todas las estructuras que componen este modelo.
 
 \begin{figure}[ht]
 	\centering
@@ -96,13 +96,13 @@ A continuación, se detalla la funcionalidad de cada una de ellas:
 	\item \texttt{Hardware}: no es parte del software. Se la incluye en el diagrama para poner en contexto a las siguientes capas.
 	\item \texttt{ST HAL}: es la biblioteca HAL ofrecida por el fabricante del microcontrolador \cite{st:um1725}. Se la usa para configurar el reloj del sistema y los periféricos utilizados. En esta capa se incluye también la biblioteca USB desarrollada por ST.
 	\item \texttt{freeRTOS}: es la biblioteca de FreeRTOS, desarrollada por terceros \cite{freertos:rtos-book}.
-	\item \texttt{os}: es un wrapper en \texttt{C++} de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
-	\item \texttt{hal}: es un wrapper en \texttt{C++} de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
+	\item \texttt{os}: es un wrapper en C++ de primitivas de kernel tales como colas, tareas o mutex, entre otras. Su funcionalidad es proveer una capa de abstracción sobre el sistema operativo utilizado, así como ofrecer más niveles de personalización, facilidad de uso y seguridad sobre las primitivas encapsuladas.
+	\item \texttt{hal}: es un wrapper en C++ de los periféricos utilizados, tales como UART, GPIO, USB, etc. Al igual que \texttt{os} busca desacoplar el periférico de la plataforma utilizada.
 	\item \texttt{svc}: capa de servicios de la aplicación. Son módulos de mayor nivel que engloban tareas específicas, relacionadas con los requerimientos de la aplicación.
-	\item \texttt{app}: capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
+	\item \texttt{app}: capa de aplicación. Es la encargada de instanciar todos los servicios de modo de cumplir con los requerimientos del firmware. También, define los tipos de datos mencionados en la sección \ref{diagrama-bloques-sistema}.
 \end{itemize}
 
-Con base en el esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama en alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realizará un análisis más exhaustivo.
+Con base en el esquema de capas propuesto, en la figura \ref{fig:fw-arch} se observa un diagrama de alto nivel de los componentes que integran a la aplicación. En secciones posteriores se realiza un análisis más exhaustivo.
 
 \begin{figure}[ht]
 	\centering
@@ -154,7 +154,7 @@ El servicio \texttt{svc::led} está encargado de controlar los dieciséis LEDs d
 	\label{fig:svc-led}
 \end{figure}
 
-El servicio consiste en una tarea que actualiza periódicamente el estado de los LEDs. El uso de una tarea permite implementar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como la de la figura \ref{fig:svc-led-fsm}.
+El servicio consiste en una tarea que actualiza periódicamente el estado de los LEDs. El uso de una tarea permite implementar animaciones, definidas a través de una FSM (\textit{Finite State Machine}) como se aprecia en la figura \ref{fig:svc-led-fsm}.
 
 \begin{figure}[H]
 	\centering
@@ -278,7 +278,7 @@ De este modo, queda definida la estructura general del protocolo de comunicació
 
 \section{Desarrollo del software} % 1 página
 
-En esta sección se describe el desarrollo de la aplicación de escritorio implementada con Qt6.
+En esta sección se describe el desarrollo de la aplicación de escritorio implementada con Qt 6.
 
 \subsection{Arquitectura de la aplicación}
 
@@ -297,7 +297,7 @@ Dado que Qt es un framework extenso, no es necesario utilizar todas las bibliote
 \begin{enumerate}
 	\item \texttt{Qt6::Core}: es la biblioteca que provee la funcionalidad no gráfica fundamental de Qt. Incluye el sistema de objetos basado en \texttt{QObject}, el mecanismo de señales, contenedores y utilidades para entrada/salida básica, entre otros servicios. Todas las clases de la aplicación dependen de este módulo, que funciona como capa de soporte sobre la que se construyen las demás funcionalidades \cite{qt:core}.
 
-	\item \texttt{Qt6::SerialPort}: es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace serie–USB, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
+	\item \texttt{Qt6::SerialPort}: es la biblioteca que abstrae el acceso a puertos serie de forma portable. Permite configurar parámetros como velocidad, cantidad de bits de datos, paridad y bits de parada, y ofrece operaciones de lectura y escritura mediante la clase \texttt{QSerialPort}. En la aplicación se utiliza para establecer el canal de comunicación entre la computadora y el equipo embebido a través del enlace USB-Serie, y encapsula los detalles específicos del sistema operativo \cite{qt:serialport}.
 
 	\item \texttt{Qt6::Quick}: es el módulo orientado al desarrollo de interfaces gráficas declarativas mediante QML. Proporciona los tipos básicos para definir componentes visuales, gestionar la entrada del usuario, organizar modelos y vistas de datos, además de aplicar animaciones y transiciones. En este trabajo se utiliza para implementar la interfaz de usuario de la aplicación \cite{qt:quick}.
 \end{enumerate}
@@ -311,7 +311,7 @@ La aplicación consiste en tres grandes módulos, cada uno con responsabilidades
 	\item La interfaz de usuario, desarrollada en QML.
 \end{enumerate}
 
-Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware como se muestra en \ref{fig:app-settings}, con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
+Asimismo, se desarrollaron wrappers de los tipos de datos utilizados por el firmware como se muestra en la figura \ref{fig:app-settings}, con el objetivo de extender sus propiedades y exponerlas de forma adecuada a la interfaz gráfica basada en QML. Estos wrappers se implementaron como clases derivadas de \texttt{QObject}, con propiedades declaradas mediante el sistema de metadatos de Qt (por ejemplo, \texttt{Q\_PROPERTY}) \cite{qt:qobject}. De este modo, la capa de presentación puede establecer enlaces entre los elementos visuales y dichos atributos, utilizar estas clases como modelos de datos en listas y formularios, y reflejar en pantalla las modificaciones del estado interno de la aplicación.
 
 \subsection{Diseño del gestor del puerto serie}
 Para controlar el acceso a los puertos serie, la biblioteca \texttt{Qt6::SerialPort} ofrece clases dedicadas, donde \texttt{QSerialPort} es la principal \cite{qt:qserialport}. Esta clase permite configurar los parámetros del puerto serie y realizar operaciones de lectura y escritura. El rol del gestor de puerto serie es envolver a esta clase y ofrecer métodos que faciliten la integración con el gestor de protocolo. En la figura \ref{fig:serial-port-manager} se observa un diagrama de la clase \texttt{SerialPortManager} con sus métodos y propiedades más importantes.
@@ -380,13 +380,13 @@ Desde un punto de vista eléctrico, MIDI transmite la información serie sobre u
 	\label{fig:midi-standard-hw}
 \end{figure}
 
-\footnotetext{Imagen extraída de \cite{mma:midi_spec}.}
+\footnotetext{Imagen extraída de: MIDI Manufacturers Association, \textit{MIDI 1.0 Detailed Specification}, documento 96-1-4, versión 4.2.1, 1996.}
 
 Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentación; las resistencias $R_a$, $R_b$ y $R_c$ y la etapa adaptadora de impedancia (representada con dos inversores lógicos en cascada). Por el contrario, un 1 lógico abre el lazo, por lo que no circula corriente entre el transmisor y el receptor. Dado que el estado de reposo de la UART es con su salida en alto, en un lazo MIDI no circulará corriente hasta que transmitan datos.
 
 Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde con la tecnología de la época basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
 
-En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite{mma:ca033}, donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y aumente su robustez frente a problemas de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placas de entradas y salidas que se describirán en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
+En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite{mma:ca033}, donde se modifica el circuito de la figura \ref{fig:midi-standard-hw} para que pueda operar con 3,3 V, y aumentar su robustez frente a problemas de compatibilidad electromagnética y emisión de interferencias. Este documento fue utilizado para el diseño de las placas de entradas y salidas que se describen en las subsecciones \ref{hw-entradas} y \ref{hw-salidas}.
 
 \subsection{Diseño de la placa de entradas}
 \label{hw-entradas}
@@ -442,7 +442,7 @@ Para el diseño de la conexión USB y la etapa reguladora se tomó como referenc
 	\label{fig:circuit-usb}
 \end{figure}
 
-En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se modificó el circuito original del kit de desarrollo, ya que se deseaba usar un regulador con menor tensión de dropout. Se optó por utilizar el AP7361C, que ofrece 360 mV nominales de caída \cite{diodes:ap7361c}. Por otro lado, se utilizó el ST890 \cite{st:st890} como etapa de protección contra sobrecorriente. Esta corriente fue limitada a 500 mA. En el apéndice \ref{anexo:criterios} se puede consultar cómo se dimensionó la resistencia de sensado.
+En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se modificó el circuito original del kit de desarrollo, ya que se deseaba usar un regulador con menor tensión de dropout. Se optó por utilizar el regulador AP7361C, que ofrece 360 mV nominales de caída \cite{diodes:ap7361c}. Por otro lado, se utilizó el ST890 \cite{st:st890}, un interruptor de alimentación con limitación de corriente, como etapa de protección contra sobrecorriente. Esta corriente se limitó a 500 mA. En el apéndice \ref{anexo:criterios} se puede consultar cómo se dimensionó la resistencia de sensado.
 
 \begin{figure}[H]
 	\centering
@@ -451,7 +451,7 @@ En la figura \ref{fig:circuit-power} se observa la fuente de alimentación. Se m
 	\label{fig:circuit-power}
 \end{figure}
 
-La conexión de las entradas MIDI y de la placa de usuario es directa con el microcontrolador, por lo que no se necesitan componentes adicionales. Por el contrario, la conexión con la placa de salidas posee un buffer cuya función es subir la tensión de las señales (de 3,3 V a 5 V) y adaptar impedancias. En la figura \ref{fig:circuit-out-connector} se muestra el circuito de esta etapa, basado en el 74HCS244 \cite{ti:sn74hcs244} como componente central.
+La conexión de las entradas MIDI y de la placa de usuario es directa con el microcontrolador, por lo que no se necesitan componentes adicionales. Por el contrario, la conexión con la placa de salidas posee un buffer cuya función es subir la tensión de las señales (de 3,3 V a 5 V) y adaptar impedancias. En la figura \ref{fig:circuit-out-connector} se muestra el circuito de esta etapa, basado en el óctuple buffer  74HCS244 \cite{ti:sn74hcs244} como componente central.
 
 \begin{figure}[H]
 	\centering

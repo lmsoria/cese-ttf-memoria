@@ -9,7 +9,7 @@ En este capítulo se presentan las pruebas realizadas para validar el funcionami
 
 \section{Compilación como herramienta de verificación} % 1 página
 
-En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje \texttt{C++20}, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución y se mejoró la confiabilidad general del sistema.
+En el desarrollo del firmware y el software se adoptó la compilación no solo como una etapa necesaria para la generación del código ejecutable, sino también como una herramienta activa de verificación. A través del uso de características del lenguaje C++20, fue posible detectar una amplia variedad de errores en tiempo de compilación. Como consecuencia, se redujo la probabilidad de fallas en tiempo de ejecución y se mejoró la confiabilidad general del sistema.
 
 Este enfoque resulta de interés en sistemas embebidos, donde las capacidades de depuración pueden ser limitadas y los errores detectados en campo pueden implicar costos elevados. En este contexto, el compilador actúa como un verificador estático que valida invariantes del diseño antes de que el firmware sea desplegado en el hardware objetivo.
 
@@ -29,7 +29,7 @@ Este paradigma de programación resultó en una primera línea de defensa frente
 
 \section{Pruebas unitarias del firmware} % 2 páginas
 
-Las pruebas unitarias del firmware se orientaron a verificar el comportamiento funcional de los componentes que forman parte directa del flujo de datos principal de la aplicación. Como se mencionó en \ref{subsection:io}, este flujo comprende la recepción de datos crudos desde las interfaces de entrada, su interpretación como mensajes MIDI, la aplicación de reglas de filtrado y, finalmente, el enrutamiento hacia las salidas correspondientes como se muestra en la figura \ref{fig:svc-in-pipe}.
+Las pruebas unitarias del firmware se orientaron a verificar el comportamiento funcional de los componentes que forman parte directa del flujo de datos principal de la aplicación. Como se mencionó en la subsección \ref{subsection:io}, este flujo comprende la recepción de datos crudos desde las interfaces de entrada, su interpretación como mensajes MIDI, la aplicación de reglas de filtrado y, finalmente, el enrutamiento hacia las salidas correspondientes como se muestra en la figura \ref{fig:svc-in-pipe}.
 
 Con base en este criterio, se realizaron pruebas unitarias sobre los siguientes componentes:
 \begin{itemize}
@@ -43,7 +43,7 @@ Con base en este criterio, se realizaron pruebas unitarias sobre los siguientes 
 \subsection{Pruebas del buffer circular}
 La estructura \texttt{RingBuffer} se utiliza para el almacenamiento temporal dentro del flujo de datos del firmware.
 
-Las pruebas unitarias verificaron las propiedades fundamentales de una cola FIFO circular:
+Las pruebas unitarias verificaron las propiedades fundamentales de una cola FIFO (\textit{First In, First Out}) circular:
 \begin{itemize}
 	\item Estado inicial del buffer.
 	\item Operaciones de lectura y escritura con y sin wrap-around.
@@ -115,8 +115,8 @@ Numerados se encuentran:
 	\item El DUT (la placa central del router).
 	\item El analizador lógico.
 	\item El programador.
-	\item El conversor USB-serie de debug.
-	\item Los conversores USB-serie que inyectan mensajes MIDI.
+	\item El conversor USB-Serie de depuración.
+	\item Los conversores USB-Serie que inyectan mensajes MIDI.
 \end{enumerate}
 
 La inyección de mensajes y su captura en el analizador lógico fueron automatizadas mediante scripts de Python. Esto permite generar distintos casos de prueba y recolectar métricas que permitan caracterizar al equipo de forma repetitiva. Para este trabajo se contemplaron los siguientes casos:
@@ -286,7 +286,7 @@ La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del um
 	\label{fig:test_4-1_hist}
 \end{figure}
 
-El histograma exhibe un comportamiento multimodal, donde cada pico se asocia a una posición distinta del mensaje dentro de la cola de salida. La componente base se ubica alrededor de 2 ms, en línea con la latencia global del ensayo \ref{ensayo-4-4}. La figura \ref{fig:test_4-1_boxplot} muestra el diagrama de caja por entrada.
+	El histograma exhibe un comportamiento multimodal, donde cada pico se asocia a una posición distinta del mensaje dentro de la cola de salida. La componente base se ubica alrededor de 2 ms, en línea con la latencia global del ensayo de la subsección \ref{ensayo-4-4}. La figura \ref{fig:test_4-1_boxplot} muestra el diagrama de caja por entrada.
 
 \begin{figure}[h]
 	\centering
