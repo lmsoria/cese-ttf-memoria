@@ -19,7 +19,7 @@ Asimismo, se utilizaron mecanismos de verificación estática explícita para im
 
 Otra característica central del lenguaje empleada fue el uso de conceptos, introducidos en C++20. Los conceptos permitieron expresar de manera declarativa los requisitos que deben cumplir los tipos utilizados en interfaces genéricas (plantillas). En lugar de aceptar cualquier tipo compatible sintácticamente y delegar la detección de errores a mensajes crípticos del compilador, se definieron contratos claros sobre las capacidades requeridas. De este modo, el uso incorrecto de una API produce diagnósticos precisos y localizados, lo que simplifica tanto el desarrollo como la verificación del firmware.
 
-Finalmente, se aprovechó el carácter fuertemente tipado del lenguaje para modelar dominios específicos del problema. En lugar de representar conceptos distintos mediante tipos primitivos intercambiables, se definieron tipos diferenciados para representar identificadores, índices, unidades lógicas y estados del sistema. Esta decisión redujo la posibilidad de errores por confusión semántica, ya que operaciones inválidas entre conceptos incompatibles quedan prohibidas por el sistema de tipos y son rechazadas durante la compilación.
+Finalmente, se aprovechó la fortaleza del tipado del lenguaje para modelar dominios específicos del problema. En lugar de representar conceptos distintos mediante tipos primitivos intercambiables, se definieron tipos diferenciados para representar identificadores, índices, unidades lógicas y estados del sistema. Esta decisión redujo la posibilidad de errores por confusión semántica, ya que operaciones inválidas entre conceptos incompatibles quedan prohibidas por el sistema de tipos y son rechazadas durante la compilación.
 
 Este paradigma de programación resultó en una primera línea de defensa frente a errores de diseño e integración. La detección temprana de inconsistencias contribuyó a disminuir la complejidad de los ensayos dinámicos posteriores y fortaleció la robustez del sistema desarrollado.
 
@@ -69,6 +69,24 @@ Las pruebas unitarias se enfocaron en validar el estado inicial sin rutas habili
 La clase \texttt{app::Serializer} constituye la etapa final del flujo de datos del firmware y se encarga de convertir los mensajes MIDI estructurados en una secuencia de bytes apta para su transmisión.
 
 Las pruebas unitarias verificaron la correcta serialización de los distintos tipos de mensajes MIDI, de forma tal que la secuencia de bytes generada respete el formato definido por la especificación del protocolo. Asimismo, se comprobó la preservación de la información original de estado, canal y datos.
+
+\subsection{Resultados}
+
+La figura \ref{fig:unit-tests-run} muestra la ejecución de la suite de pruebas unitarias de los módulos analizados en las subsecciones anteriores. En total se ejecutaron 92 casos de prueba y todos finalizaron de forma satisfactoria, sin fallas registradas. Por otra parte, la figura \ref{fig:unit-tests-coverage} presenta el reporte de cobertura obtenido con \texttt{gcov}. A nivel global, se alcanzó una cobertura de 81,5\,\% de líneas, 98,9\,\% de funciones y 62,3\,\% de ramas.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/test-run.png}
+	\caption{Ejecución de la suite de pruebas unitarias del firmware.}
+	\label{fig:unit-tests-run}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{./Figures/test-coverage.png}
+	\caption{Reporte de cobertura de las pruebas unitarias obtenido con \texttt{gcov}.}
+	\label{fig:unit-tests-coverage}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 
@@ -230,7 +248,7 @@ Los resultados indican una latencia media global de 2 ms, con dispersión acotad
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{./Figures/test_4-4_hist.png}
+	\includegraphics[width=0.78\textwidth]{./Figures/test_4-4_hist.png}
 	\caption{Histograma de latencia para el caso 4$\rightarrow$4.}
 	\label{fig:test_4-4_hist}
 \end{figure}
@@ -277,7 +295,7 @@ Dado que múltiples entradas compiten por el mismo recurso de transmisión, se e
 	}
 \end{table}
 
-La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del umbral de 10 ms adoptado como requerimiento. La figura \ref{fig:test_4-1_hist} presenta el histograma global.
+La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del umbral de 10 ms adoptado como requerimiento. La figura \ref{fig:test_4-1_hist} presenta el histograma global. Este exhibe un comportamiento multimodal, donde cada pico se asocia a una posición distinta del mensaje dentro de la cola de salida. La componente base se ubica alrededor de 2 ms, en línea con la latencia global del ensayo de la subsección \ref{ensayo-4-4}.
 
 \begin{figure}[H]
 	\centering
@@ -286,7 +304,7 @@ La latencia máxima medida alcanza 5 ms, valor que se mantiene por debajo del um
 	\label{fig:test_4-1_hist}
 \end{figure}
 
-	El histograma exhibe un comportamiento multimodal, donde cada pico se asocia a una posición distinta del mensaje dentro de la cola de salida. La componente base se ubica alrededor de 2 ms, en línea con la latencia global del ensayo de la subsección \ref{ensayo-4-4}. La figura \ref{fig:test_4-1_boxplot} muestra el diagrama de caja por entrada.
+La figura \ref{fig:test_4-1_boxplot} muestra el diagrama de caja por entrada.
 
 \begin{figure}[h]
 	\centering

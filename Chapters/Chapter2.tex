@@ -135,7 +135,7 @@ Para desarrollar el equipo, el requerimiento más importante del microcontrolado
 		Núcleo                  & ARM Cortex-M4F          \\
 		Frecuencia máxima       & 100 MHz                 \\
 		Memoria flash           & 1,5 Mbytes              \\
-		Memoria RAM             & 320 Kbytes              \\
+		Memoria RAM             & 320 kbytes              \\
 		Cantidad de UARTs       & 10                      \\
 		Canales de DMA          & 16                      \\
 		Conectividad USB        & 2.0 OTG FS              \\
@@ -188,7 +188,7 @@ La utilización de esta biblioteca permitió incorporar una interfaz de comunica
 Como sistema operativo en tiempo real se utilizó FreeRTOS \cite{freertos:kernel}, un kernel ampliamente difundido en sistemas embebidos de recursos acotados. FreeRTOS proporciona mecanismos de planificación de tareas, colas de mensajes, semáforos y temporizadores de software, entre otros servicios básicos necesarios para estructurar aplicaciones concurrentes sobre microcontroladores.
 
 \subsection{Herramientas de testing}
-Se utilizó GoogleTest \cite{googletest} para implementar y ejecutar los tests unitarios de los módulos desarrollados. Por otro lado, se recurrió a Python 3.10 \cite{python} para automatizar las pruebas de latencia y procesar los resultados generados.
+Se empleó GoogleTest \cite{googletest} para implementar y ejecutar los tests unitarios de los módulos desarrollados. Además, se utilizó la herramienta \texttt{gcov} \cite{gcc:gcov}, incluida en el toolchain empleado, para analizar la cobertura de código. Por otro lado, se recurrió a Python \cite{python} para automatizar las pruebas de latencia y procesar los resultados generados.
 
 %----------------------------------------------------------------------------------------
 

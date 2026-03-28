@@ -206,40 +206,6 @@ El proceso de transmisión es un procedimiento más simple, tal como puede obser
 
 Una vez que el mensaje se serializa, su contenido se copia en el buffer circular de la UART para su posterior transmisión. Con este paso concluye el proceso.
 
-%\subsection{Diseño del servicio de comunicación}
-%El servicio \texttt{svc::comms} es el encargado de gestionar la comunicación con la aplicación de escritorio mediante la emulación de un puerto serie virtual por USB. En la figura \ref{fig:svc-comms} se observa un diagrama en bloques del servicio.
-%
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=\textwidth]{./Figures/svc-comms.png}
-%	\caption{Diagrama en bloques del servicio de comunicación.}
-%	\label{fig:svc-comms}
-%\end{figure}
-%
-%En líneas generales, el servicio se compone de dos tareas: una encargada de la recepción y deserialización de comandos, y la otra encargada de la serialización y transmisión de respuestas. La definición de los comandos, respuestas y las funciones de serialización y deserialización se desarrollaron en una biblioteca independiente llamada \texttt{protocol}, que también es compartida con la aplicación. En la figura \ref{fig:proto-command} se ilustra un diagrama de clases de las estructuras definidas en el protocolo.
-%
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=0.8\textwidth]{./Figures/proto-command.png}
-%	\caption{Estructuras utilizadas en el protocolo de comandos.}
-%	\label{fig:proto-command}
-%\end{figure}
-%
-%Un mensaje (\texttt{proto::Packet<T>}) es una plantilla de clase que consiste en un encabezado (\texttt{proto::Header}), el contenido del mensaje y un código CRC (\textit{Cyclic Redundancy Check}) que se utiliza para verificar la integridad del contenido. El encabezado es a su vez otra estructura que contiene información sobre el tipo de mensaje (identificado mediante una enumeración llamada \texttt{CommandID}) y la cantidad de bytes que ocupa el contenido. Por otro lado, para detectar el comienzo de una trama se agregó un campo llamado \texttt{magic} que contiene un valor fijo de 32 bits. Cuando se encuentre esa secuencia en un buffer el deserializador puede detectar el encabezado y proceder con la decodificación. Finalmente, para garantizar compatibilidad futura, se agregó un campo que representa la versión del protocolo.
-%
-%El contenido de cada mensaje es, a su vez, una estructura que contiene la información necesaria para procesar cada comando. Una vez decodificados, se envían eventos a la aplicación principal para procesarlos y generar la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra un diagrama de secuencia que representa el intercambio de mensajes entre la aplicación y el firmware.
-%
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics[width=0.7\textwidth]{./Figures/proto-sequence.png}
-%	\caption{Diagrama de secuencia del procesamiento de comandos del protocolo.}
-%	\label{fig:proto-sequence}
-%\end{figure}
-%
-%En caso de que haya un error en la deserialización del comando recibido, el servicio se encarga de enviar un pedido de retransmisión (\texttt{Retx}) como respuesta.
-%
-%De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
-
 \subsection{Diseño del servicio de comunicación}
 El servicio \texttt{svc::comms} gestiona la comunicación con la aplicación de escritorio a través de un puerto serie virtual sobre USB. En la figura \ref{fig:svc-comms} se muestra un diagrama en bloques del servicio.
 
@@ -263,14 +229,16 @@ Cada mensaje se representa mediante la plantilla \texttt{proto::Packet<T>}, comp
 
 Una vez validada y decodificada la trama, el servicio envía eventos a la aplicación principal para su procesamiento y para la generación de la respuesta correspondiente. En la figura \ref{fig:proto-sequence} se ilustra el intercambio de mensajes entre la aplicación y el firmware. Si se detecta un error durante la decodificación o en la verificación de integridad, el servicio responde con un pedido de retransmisión (\texttt{Retx}).
 
+\newpage
+
+De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./Figures/proto-sequence.png}
 	\caption{Diagrama de secuencia del procesamiento de comandos del protocolo.}
 	\label{fig:proto-sequence}
 \end{figure}
-
-De este modo, queda definida la estructura general del protocolo de comunicación. En el apéndice \ref{anexo:comandos} se puede consultar la lista de mensajes desarrollados.
 
 %----------------------------------------------------------------------------------------
 
@@ -334,16 +302,16 @@ La responsabilidad de esta clase contempla:
 \subsection{Diseño del gestor de protocolo}
 El gestor de protocolo cumple la función de puente entre \texttt{SerialPortManager} y la interfaz gráfica. Se encarga de decodificar los bytes recibidos, transformarlos en comandos del protocolo y actualizar una instancia de tipo \texttt{app::Settings}, de modo que ese objeto refleje el estado del firmware cada vez que el equipo transmite la configuración completa. En la figura \ref{fig:protocol-manager} se observa un diagrama de la clase \texttt{ProtocolManager}.
 
-\begin{figure}[ht]
+De manera recíproca, la interacción del usuario con los elementos de la interfaz gráfica produce señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones convierten las operaciones solicitadas en comandos del protocolo, los serializan y los envían a través de \texttt{SerialPortManager}. Por este motivo, la clase ofrece métodos que replican los comandos y respuestas listados en las tablas \ref{tab:proto-commands} y \ref{tab:proto-responses}, respectivamente.
+
+Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar llamada \texttt{SettingsParser} que opera como una máquina de estados: interpreta los comandos relacionados con la transmisión del estado del sistema, reconstruye la estructura \texttt{app::Settings} a partir de los fragmentos recibidos y notifica cuando se finalizó la reconstrucción.
+
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./Figures/protocol-manager.png}
 	\caption{Diagrama de la clase \texttt{ProtocolManager}.}
 	\label{fig:protocol-manager}
 \end{figure}
-
-De manera recíproca, la interacción del usuario con los elementos de la interfaz gráfica produce señales que invocan métodos en \texttt{ProtocolManager}. Estas funciones convierten las operaciones solicitadas en comandos del protocolo, los serializan y los envían a través de \texttt{SerialPortManager}. Por este motivo, la clase ofrece métodos que replican los comandos y respuestas listados en las tablas \ref{tab:proto-commands} y \ref{tab:proto-responses}, respectivamente.
-
-Internamente, \texttt{ProtocolManager} define y contiene una estructura auxiliar llamada \texttt{SettingsParser} que opera como una máquina de estados: interpreta los comandos relacionados con la transmisión del estado del sistema, reconstruye la estructura \texttt{app::Settings} a partir de los fragmentos recibidos y notifica cuando se finalizó la reconstrucción.
 
 \subsection{Implementación de la interfaz gráfica}
 Para la implementación de la interfaz gráfica se utilizó QML, un lenguaje declarativo con una sintaxis similar a JavaScript. Qt ofrece el módulo \texttt{QtQuick Controls}, que permite emplear componentes estándar como botones, campos de texto y sliders, entre otros \cite{qt:quickcontrols}. Estos componentes proveen un estilo visual definido por el sistema operativo. No obstante, la documentación también describe mecanismos de personalización que permiten adaptar su apariencia a los requerimientos de UX/UI (\textit{User Experience/User Interface}). En la figura \ref{fig:ui} se muestra el aspecto final de la interfaz gráfica desarrollada.
@@ -363,7 +331,7 @@ La aplicación consiste en tres sectores:
 \end{enumerate}
 
 %----------------------------------------------------------------------------------------
-\newpage
+
 %----------------------------------------------------------------------------------------
 
 \section{Desarrollo del hardware} % 1 página
@@ -371,18 +339,18 @@ La aplicación consiste en tres sectores:
 En esta sección se describe el proceso de diseño de los circuitos electrónicos que componen al router, así como el gabinete que contiene las placas ensambladas.
 
 \subsection{Especificación eléctrica de MIDI}
-Desde un punto de vista eléctrico, MIDI transmite la información serie sobre un lazo de corriente de 5 mA formado entre el transmisor y el receptor. En la figura \ref{fig:midi-standard-hw} se observa el esquemático original propuesto por la MMA en \cite{mma:midi_spec}.
+Desde un punto de vista eléctrico, MIDI transmite la información serie sobre un lazo de corriente de 5 mA formado entre el transmisor y el receptor. En la figura \ref{fig:midi-standard-hw} se observa una versión simplificada del esquemático original propuesto por la MMA en \cite{mma:midi_spec}.
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.6\textwidth]{./Figures/midi-standard-hw.png}
+	\includegraphics[width=0.6\textwidth]{./Figures/midi-standard-hw-2.png}
 	\caption{Esquemático de los circuitos de recepción y transmisión MIDI\protect\footnotemark.}
 	\label{fig:midi-standard-hw}
 \end{figure}
 
-\footnotetext{Imagen extraída de: MIDI Manufacturers Association, \textit{MIDI 1.0 Detailed Specification}, documento 96-1-4, versión 4.2.1, 1996.}
+\footnotetext{Imagen adaptada de: MIDI Manufacturers Association, \textit{MIDI 1.0 Detailed Specification}, documento 96-1-4, versión 4.2.1, 1996.}
 
-Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentación; las resistencias $R_a$, $R_b$ y $R_c$ y la etapa adaptadora de impedancia (representada con dos inversores lógicos en cascada). Por el contrario, un 1 lógico abre el lazo, por lo que no circula corriente entre el transmisor y el receptor. Dado que el estado de reposo de la UART es con su salida en alto, en un lazo MIDI no circulará corriente hasta que transmitan datos.
+Un 0 lógico en la UART transmisora cierra el lazo compuesto entre la alimentación; las resistencias $R_a$, $R_b$ y $R_c$ y la etapa adaptadora de impedancia (buffer). Por el contrario, un 1 lógico abre el lazo, por lo que no circula corriente entre el transmisor y el receptor. Dado que el estado de reposo de la UART es con su salida en alto, en un lazo MIDI no circulará corriente hasta que transmitan datos.
 
 Puede notarse que para manejar el envío de datos se utiliza una tensión de 5 V, acorde con la tecnología de la época basada en circuitos integrados TTL (\textit{Transistor-Transistor Logic}). Un optoacoplador aísla eléctricamente la etapa transmisora de la receptora para evitar lazos de tierra que puedan alterar la integridad de las señales.
 
@@ -392,22 +360,22 @@ En 2014, la MMA actualizó la especificación mediante el documento CA-033 \cite
 \label{hw-entradas}
 Para diseñar la etapa de entrada, se tomó como referencia el circuito propuesto por la MMA en \cite{mma:ca033}. La topología es similar al circuito de la figura \ref{fig:midi-standard-hw}, con el agregado de componentes pasivos (ferritas y capacitores) para bloquear emisiones electromagnéticas indeseadas. En la figura \ref{fig:circuit-input-stage} se observa el diseño implementado.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{./Figures/circuit-input-stage.png}
+	\includegraphics[width=0.9\textwidth]{./Figures/circuit-input-stage.png}
 	\caption{Circuito de entrada MIDI.}
 	\label{fig:circuit-input-stage}
 \end{figure}
 
-Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 K$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas permiten una fácil soldadura manual.
+Se optó por utilizar el TLP2361 como optoacoplador \cite{toshiba:tlp2361}. Es una alternativa que no requiere de componentes adicionales y soporta una tensión de alimentación entre 2,7 V y 5,5 V. Por otro lado, \cite{mma:ca033} sugiere agregar ferritas que posean una impedancia de 1 k$\Omega$ a los 100 MHz. Se utilizó la línea MPZ2012 de TDK \cite{tdk:mpz2012}, debido a que sus dimensiones físicas permiten una fácil soldadura manual.
 
 \subsection{Diseño de la placa de salidas}
 \label{hw-salidas}
 De manera análoga a la placa de entradas, la placa de salida fue diseñada de acuerdo a los lineamientos de \cite{mma:ca033}. Se optó por dejar la etapa de buffers en la placa principal, para que se encuentre más cercana al microcontrolador. Por lo tanto, la placa de salidas solamente posee los conectores y los componentes pasivos para compatibilidad EMI/EMC. En la figura \ref{fig:circuit-output-stage} se observa el bloque funcional de una salida, que luego fue replicado ocho veces.
 
-\begin{figure}[ht]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{./Figures/circuit-output-stage.png}
+	\includegraphics[width=0.6\textwidth]{./Figures/circuit-output-stage.png}
 	\caption{Circuito de salida MIDI.}
 	\label{fig:circuit-output-stage}
 \end{figure}
@@ -417,7 +385,7 @@ La placa de usuario consiste en un soporte de los dieciséis diodos LED y el enc
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\textwidth]{./Figures/circuit-user.png}
+	\includegraphics[width=0.8\textwidth]{./Figures/circuit-user.png}
 	\caption{Circuito de usuario.}
 	\label{fig:circuit-user}
 \end{figure}
@@ -428,7 +396,7 @@ La placa central consiste en cinco bloques, que se ilustran en la figura \ref{fi
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\textwidth]{./Figures/hw-blocks.png}
+	\includegraphics[width=\textwidth]{./Figures/hw-blocks.png}
 	\caption{Diagrama en bloques de la placa central.}
 	\label{fig:hw-blocks}
 \end{figure}
@@ -455,7 +423,7 @@ La conexión de las entradas MIDI y de la placa de usuario es directa con el mic
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{./Figures/circuit-out-connector.png}
+	\includegraphics[width=\textwidth]{./Figures/circuit-out-connector.png}
 	\caption{Circuito de adaptación hacia la placa de salidas MIDI.}
 	\label{fig:circuit-out-connector}
 \end{figure}
@@ -496,7 +464,7 @@ En la figura \ref{fig:mrc-main-board} se muestran las vistas superior e inferior
 
 \subsection{Diseño del gabinete}
 
-Las placas de circuito impreso fueron diseñadas con la intención de ser alojadas en un gabinete tipo rack de 19 pulgadas, ya que están estandarizados para equipamiento electrónico e informático. Estos gabinetes se dimensionan mediante unidades de rack (1 U equivale a 1,75 pulgadas). Se estableció como requerimiento usar un gabinete de 1 RU.
+Las placas de circuito impreso fueron diseñadas con la intención de ser alojadas en un gabinete tipo rack de 19 pulgadas, ya que están estandarizados para equipamiento electrónico e informático. Estos gabinetes se dimensionan mediante unidades de rack o RU (1 RU equivale a 1,75 pulgadas). Se estableció como requerimiento usar un gabinete de 1 RU.
 
 Dado que son gabinetes estandarizados, se contactó a un proveedor para coordinar el mecanizado del frente de un gabinete de 100 mm de profundidad. Para ello se modeló el gabinete en Fusion 360, y se colocaron los modelos 3D de las placas exportados en KiCad. Una vez modelado el panel frontal, se exportó el archivo \texttt{.dxf} requerido por el fabricante para realizar el mecanizado. En la figura \ref{fig:gabinete} se observa una fotografía del equipo ensamblado en el gabinete, con la tapa superior removida para mayor visibilidad.
 
